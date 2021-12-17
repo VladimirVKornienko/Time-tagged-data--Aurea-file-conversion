@@ -52,4 +52,7 @@ int _fseeki64(
 );
 <<<<
 
+(5.iv) Change measurement time calculation to a precise one (add Time, not only Tag):
+"AureaPreProcessingToHH_T2.cpp" -> at "// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK"
+
 [(End of ReadMe file.)]

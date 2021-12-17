@@ -6,12 +6,23 @@
 */
 
 
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
+//		Stage1 (+) splits the file in three + extracts PSin1Tag, MeasTime, Nch1, Nch2 from the file.		//
+//		Stage2 (+) gets some of those parameters as inputs, and makes a *.PTU file in reqired format.		//
+//		Stage3 (not ready / unstable) is same to Stage2, but splits the initial file in chunks of			//
+//																		<TimeToSplitSEC> time chunks each.	//
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
+
+
+
+
+
 // VKORN_TUESDAY >>
 // <<< Label for the recent changes in file I/O: from "write" to "<<".
 
 
 #define AUREABytesInATagName	32	// for formatting the header file.
-#define AUREAGlobalResolution 1.0e-12 // in seconds; universal, everywhere here...
+#define AUREAGlobalResolution	1.0e-12 // in seconds; universal, everywhere here...
 
 // Nov.20: for "Stage2", added rounding to the nearest ps value: value = round( value * 1000.0 ) / 1000.0;
 
@@ -69,18 +80,14 @@ using namespace std;
 
 
 
-//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
-//		Stage1 splits the file in three + extracts PSin1Tag, MeasTime, Nch1, Nch2 from the file.		//
-//		Stage2 gets some of those parameters as inputs, and makes a *.PTU file in reqired format.		//
-//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
-
-
 //int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1, const char* fileOutNameCh2,
 //	const char* fileOutNameHEADER, double* outAureaPSin1Tag,
 //	uint64_t* outMeasTime, uint64_t* outNCh1, uint64_t* outNCh2, uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped)
 int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1, const char* fileOutNameCh2,
 	const char* fileOutNameHEADER, double* outAureaPSin1Tag,
 	double* outMeasTime, uint64_t* outNCh1, uint64_t* outNCh2, uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped)
+
+	// outMeasTime : Total measurement time in milliseconds, to be returned.
 
 {
 	//	*	*	*	*	*	*	*	*	//
@@ -91,34 +98,35 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	//		Also, skip bad entries (with either '0' or very large values
 	//				(5.58344e+7 and 5.58345e+7 for 625 kHz freq (divider 1 = none)) ). //
 	
+	//   >>>   DEFINE THESE !!  >>>   //
 	const char myFreqLine[] = "%   Sync freq:";	// header prefix before the Sync. freq.
-	double myUpperDiscrLevelFraction = 1.00; // a fraction of the (1/freq), will be calculated later //
-		
-	//   <<<   DEFINE THOSE !!  <<<   //
+	double myUpperDiscrLevelFraction = 1.00;	// a fraction of the (1/freq), will be calculated later
+												// all delays above that value will be treated as erroneous records.
 
-	// uint64_t outMeasTime = 0;	// Total measurement time in ps, to be returned;
-	// OR IN MILLISECONDS??!? //
+	double myLowerDiscrLevel = 1.0e-6;			// entered manually
+	//   <<<   DEFINE THESE !!  <<<   //
 
 	uint64_t ch1Nskipped = 0;
-	uint64_t ch2Nskipped = 0;
-	// uint64_t NtotalAll = 0;
+	uint64_t ch2Nskipped = 0;		// bad records not passing the discriminator
+									// see also <myUpperDiscrLevel> and <myLowerDiscrLevel>
+
 	uint64_t NtotCh1 = 0;
 	uint64_t NtotCh2 = 0;
 	
 	double myUpperDiscrLevel = 0; // ns (!) // Will mainly be used for checking the wrong values of Times... //
-	// unsigned int myAureaFreq = 0; // to be read later from the file header;
 	double myAureaFreq = 0; // to be more flexible... though unsigned long should be enough.
 
-	// all delays above that value will be treated as erroneous records. //
+	// >>>>>>>>>>
+	// The line below can be used (it is believed to speed up the execution), 
+	//    but from my experience it complicates the output and mixed it up.
+	// Can probably be used with file output streams.
 	
-
-	// VKORN_TUESDAY >>
-	// Not sure if it speeds everything up or not >>> //
 	// std::ios_base::sync_with_stdio(false);
-	// closing statement is below
-	// <<< //
-	// << VKORN_TUESDAY
 	
+	// closing statement is below, in the same function.
+	// <<<<<<<<<<
+
+	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
 	// Getting total experiment time: >>
 	uint64_t	maxTAG = 0;
 	// Will be +1 after last entry. (An approximation, but quite accurate one!).
@@ -345,7 +353,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			// process the string
 			
 			// REMOVING BAD RECORDS: //
-			if ((ch1time > 1e-6) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+			if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
 			{
 				// VKORN_TUESDAY >>
 				// OLD:
@@ -369,7 +377,6 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 				ch1LastTag = ch1tag;
 				
-				// NtotalAll++;
 				NtotCh1 = NtotCh1 + ((uint64_t)1);
 			}
 			else
@@ -377,7 +384,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 				ch1Nskipped = ch1Nskipped + ((uint64_t)1);
 			}
 
-			if ((ch2time > 1e-6) && (ch2time < myUpperDiscrLevel))
+			if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel))
 			{
 				// VKORN_TUESDAY >>
 				// OLD:
@@ -400,7 +407,6 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 				ch2LastTag = ch2tag;
 				
-				// NtotalAll++;
 				NtotCh2 = NtotCh2 + ((uint64_t)1);
 			}
 			else
@@ -429,15 +435,9 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	// i++; // overflow DEBUG control //
 	}
 	
-	// VKORN_TUESDAY >>
-	// VKORN DESPERATE FLAG >>
-	// fileOut1.flush();
-	// fileOut2.flush();
 	fflush(fileOut1);
 	fflush(fileOut2);
-	// << VKORN DESPERATE FLAG
-	// << VKORN_TUESDAY
-
+	
 	// part 3 :: 2 numbers total, only one channel left.
 	runFlag = true;
 
@@ -456,7 +456,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
 				
-				if ((ch2time > 1e-6) && (ch2time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
 				{
 					// VKORN_TUESDAY >>
 					// OLD: binary
@@ -480,7 +480,6 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 					
 					ch2LastTag = ch2tag;
 
-					//NtotalAll++;
 					NtotCh2 = NtotCh2 + ((uint64_t)1);
 				}
 				else
@@ -511,7 +510,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			numArgsRead = sscanf(line.c_str(), "%llu %lf", &ch1tag, &ch1time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
-				if ((ch1time > 1e-6) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
 				{
 					// VKORN_TUESDAY >>
 					// OLD:
@@ -535,7 +534,6 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 					ch1LastTag = ch1tag;
 
-					//NtotalAll++;
 					NtotCh1 = NtotCh1 + ((uint64_t)1);
 				}
 				else
@@ -556,32 +554,28 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		}
 	}
 
+	*outNCh1 = NtotCh1;
+	*outNCh2 = NtotCh2;
+	*OUTch1Nskipped = ch1Nskipped;
+	*OUTch2Nskipped = ch2Nskipped;
+	
+	// 17.12.2021: to be removed at some point... >>>
 	maxTAG = std::max(ch1LastTag, ch2LastTag);
 	maxTAG++;
 	// cout << "Of " << ch1LastTag << " and " << ch2LastTag << " , max (+1) chosen: " << maxTAG << std::endl;
-	   
-	*outNCh1 = NtotCh1;
-	*outNCh2 = NtotCh2;
 
-	// cout << std::endl << "Counts in Ch.1: " << NtotCh1 << " ; \tCounts in Ch.2: " << NtotCh2 << std::endl;
-	// cout << "Total counts (N_ch1 + N_ch2): " << (NtotCh1+ NtotCh2) << std::endl;
-	// cout << std::endl << "Total counts skipped (zero or too large):" << std::endl;
-	// cout << "Ch.1: " << ch1Nskipped << " \t Ch.2: " << ch2Nskipped << std::endl;
-
-	*OUTch1Nskipped = ch1Nskipped;
-	*OUTch2Nskipped = ch2Nskipped;
-
-	// CURRENTLY, I BELIEVE THE TIME TO BE IN MILLISECONDS //
-	// *outMeasTime = llround(((1.0 / myAureaFreq) * maxTAG) * 1e+12); // ps
+	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+	// ToDo:
+	//if (   (ch1LastTag > ch2LastTag) || 
+	//	   ((ch1LastTag == ch2LastTag) && (ch1LastTime))   )
+	// {
+	//	*outMeasTime = ((1.0 / myAureaFreq) * (double)maxTAG) * (1.0e+3); // ms
+	// }
+	// <<<<
 	
-	// VKORN_TUESDAY >>
+	*outMeasTime = ((1.0 / myAureaFreq) * (double)maxTAG) * (1.0e+3); // ms
 	// *outMeasTime = llround(ceil(    ((1.0 / myAureaFreq) * maxTAG)   * (1.0e+3)   )); // ms
-	
-	*outMeasTime = ((1.0 / myAureaFreq) * maxTAG) * (1.0e+3); // ms
-	// << VKORN_TUESDAY
-
-	// cout << "Max time (in milliseconds) is " << *outMeasTime << std::endl;
-	// from <readPTU>: acq_time(int) : measurement acquisition time in picoseconds
+	// changed to double due to faulty operations at small acquisition times.
 
 	// VKORN DESPERATE FLAG >>
 	// fileOut1.flush();
@@ -762,16 +756,16 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	
 	// TagRECTYPE includes first 16 bytes of the header.
 	// When all the fields from the header are parsed, can be changed to standard PQ notation.
-	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ÿÿÿÿ      ";	// HydraHarp, T2
+	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ï¿½ï¿½ï¿½ï¿½      ";	// HydraHarp, T2
 	
 	// Very bad solution: cast all the others to tyInt8 = 0x10000008, //
 	
 	std::string TagPREHEADER16bytes = "***AUREA FILE***";
-	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ÿÿÿÿ      ";	// HydraHarp, T2
-	//std::string TagNUMREC = "TTResult_NumberOfRecords        ÿÿÿÿ  "; // + append 8 bytes (uint64) <NcntsTOT>
-	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ÿÿÿÿ   ê-™—q="; // 1 ps == standard
-	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ÿÿÿÿ  "; // + append 8 bytes (uint64) <inMeasTime>
-	//std::string TagHEADEREND = "Header_End                      ÿÿÿÿ ÿÿ        "; // no change
+	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ï¿½ï¿½ï¿½ï¿½      ";	// HydraHarp, T2
+	//std::string TagNUMREC = "TTResult_NumberOfRecords        ï¿½ï¿½ï¿½ï¿½  "; // + append 8 bytes (uint64) <NcntsTOT>
+	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ï¿½ï¿½ï¿½ï¿½   ï¿½-ï¿½ï¿½ï¿½q="; // 1 ps == standard
+	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ï¿½ï¿½ï¿½ï¿½  "; // + append 8 bytes (uint64) <inMeasTime>
+	//std::string TagHEADEREND = "Header_End                      ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½        "; // no change
 
 	// Now: need to append Idx (int32_t), Type (uint32_t), and Value (8 bytes).
 	std::string TagRECTYPE = "TTResultFormat_TTTRRecType";	// HydraHarp, T2
@@ -1496,7 +1490,8 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 
 
 
-
+// ??? why is nOVFLmarkersESTIMATE value (that is output every time) changes?
+// it should be constant, from the code...
 
 
 
@@ -1516,7 +1511,14 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	// will be updated during the file processing...
 
 	// QQQQQQQQQQQQQQQQQQQQ
-	int BUBnFiles = (int)trunc( (1.0e-3) * inMeasTime / TimeToSplitSEC);
+	
+	// int BUBnFiles = (int)trunc( (1.0e-3) * inMeasTime / TimeToSplitSEC);
+	int BUBnFiles;
+	BUBnFiles = (int)(std::ceil( (double)(1.0e-3) * inMeasTime / TimeToSplitSEC));
+
+	cout << "BUBnFiles: " << BUBnFiles << " \tinMeasTime: " << inMeasTime << " \tTimeToSplitSEC: ";
+	cout << TimeToSplitSEC << std::endl;
+
 	int BUBcurrFileN = 1;
 	std::string BUBcurrOutputFileName; // will be used with <fileOutName>
 	std::string BUBtmpName; // will be used with <fileOutName>
@@ -1525,7 +1527,10 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	uint64_t nOVFLmarkersESTIMATE = (uint64_t)(trunc(
 		(inMeasTime / ((double)BUBnFiles))	* 1.0e-3 / ((double)myOverflowVal * 1.0e-12)
-													));
+	));
+	
+	// some demo code changes...
+
 	*OUTnOVFLmarkersESTIMATE = nOVFLmarkersESTIMATE;
 
 	// open files >> //
@@ -1582,16 +1587,16 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	// TagRECTYPE includes first 16 bytes of the header.
 	// When all the fields from the header are parsed, can be changed to standard PQ notation.
-	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ÿÿÿÿ      ";	// HydraHarp, T2
+	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ï¿½ï¿½ï¿½ï¿½      ";	// HydraHarp, T2
 
 	// Very bad solution: cast all the others to tyInt8 = 0x10000008, //
 
 	std::string TagPREHEADER16bytes = "***AUREA FILE***";
-	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ÿÿÿÿ      ";	// HydraHarp, T2
-	//std::string TagNUMREC = "TTResult_NumberOfRecords        ÿÿÿÿ  "; // + append 8 bytes (uint64) <NcntsTOT>
-	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ÿÿÿÿ   ê-™—q="; // 1 ps == standard
-	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ÿÿÿÿ  "; // + append 8 bytes (uint64) <inMeasTime>
-	//std::string TagHEADEREND = "Header_End                      ÿÿÿÿ ÿÿ        "; // no change
+	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ï¿½ï¿½ï¿½ï¿½      ";	// HydraHarp, T2
+	//std::string TagNUMREC = "TTResult_NumberOfRecords        ï¿½ï¿½ï¿½ï¿½  "; // + append 8 bytes (uint64) <NcntsTOT>
+	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ï¿½ï¿½ï¿½ï¿½   ï¿½-ï¿½ï¿½ï¿½q="; // 1 ps == standard
+	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ï¿½ï¿½ï¿½ï¿½  "; // + append 8 bytes (uint64) <inMeasTime>
+	//std::string TagHEADEREND = "Header_End                      ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½        "; // no change
 
 	// Now: need to append Idx (int32_t), Type (uint32_t), and Value (8 bytes).
 	std::string TagRECTYPE = "TTResultFormat_TTTRRecType";	// HydraHarp, T2

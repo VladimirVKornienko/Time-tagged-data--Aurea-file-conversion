@@ -4,8 +4,12 @@
 //int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1, const char* fileOutNameCh2,
 //	const char* fileOutNameHEADER, double* outAureaPSin1Tag);
 
-#define NOMINMAX
+#ifndef NOMINMAX
+	#define NOMINMAX
+#endif
 // << otherwise, std::max will be unavailable...
+
+
 #include <windows.h>
 // for Sleep(milliseconds); //
 
