@@ -116,16 +116,17 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	double myUpperDiscrLevel = 0; // ns (!) // Will mainly be used for checking the wrong values of Times... //
 	double myAureaFreq = 0; // to be more flexible... though unsigned long should be enough.
 
+	// >>>>>>>>>>
+	// The line below can be used (it is believed to speed up the execution), 
+	//    but from my experience it complicates the output and mixed it up.
+	// Can probably be used with file output streams.
 	
-	
-
-	// VKORN_TUESDAY >>
-	// Not sure if it speeds everything up or not >>> //
 	// std::ios_base::sync_with_stdio(false);
-	// closing statement is below
-	// <<< //
-	// << VKORN_TUESDAY
 	
+	// closing statement is below, in the same function.
+	// <<<<<<<<<<
+
+	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
 	// Getting total experiment time: >>
 	uint64_t	maxTAG = 0;
 	// Will be +1 after last entry. (An approximation, but quite accurate one!).
@@ -558,19 +559,23 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	*OUTch1Nskipped = ch1Nskipped;
 	*OUTch2Nskipped = ch2Nskipped;
 	
-	*outMeasTime = ((1.0 / myAureaFreq) * (double)maxTAG) * (1.0e+3); // ms
-	// *outMeasTime = llround(ceil(    ((1.0 / myAureaFreq) * maxTAG)   * (1.0e+3)   )); // ms
-	// changed to double due to faulty operations at small acquisition times.
-
-	// 17.12.2021: removed this - more precise calculation of the measurement time >>>
+	// 17.12.2021: to be removed at some point... >>>
 	maxTAG = std::max(ch1LastTag, ch2LastTag);
 	maxTAG++;
 	// cout << "Of " << ch1LastTag << " and " << ch2LastTag << " , max (+1) chosen: " << maxTAG << std::endl;
 
-	// YUCKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK //
-
+	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+	// ToDo:
+	//if (   (ch1LastTag > ch2LastTag) || 
+	//	   ((ch1LastTag == ch2LastTag) && (ch1LastTime))   )
+	// {
+	//	*outMeasTime = ((1.0 / myAureaFreq) * (double)maxTAG) * (1.0e+3); // ms
+	// }
 	// <<<<
-
+	
+	*outMeasTime = ((1.0 / myAureaFreq) * (double)maxTAG) * (1.0e+3); // ms
+	// *outMeasTime = llround(ceil(    ((1.0 / myAureaFreq) * maxTAG)   * (1.0e+3)   )); // ms
+	// changed to double due to faulty operations at small acquisition times.
 
 	// VKORN DESPERATE FLAG >>
 	// fileOut1.flush();
@@ -751,16 +756,16 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	
 	// TagRECTYPE includes first 16 bytes of the header.
 	// When all the fields from the header are parsed, can be changed to standard PQ notation.
-	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ÿÿÿÿ      ";	// HydraHarp, T2
+	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ï¿½ï¿½ï¿½ï¿½      ";	// HydraHarp, T2
 	
 	// Very bad solution: cast all the others to tyInt8 = 0x10000008, //
 	
 	std::string TagPREHEADER16bytes = "***AUREA FILE***";
-	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ÿÿÿÿ      ";	// HydraHarp, T2
-	//std::string TagNUMREC = "TTResult_NumberOfRecords        ÿÿÿÿ  "; // + append 8 bytes (uint64) <NcntsTOT>
-	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ÿÿÿÿ   ê-™—q="; // 1 ps == standard
-	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ÿÿÿÿ  "; // + append 8 bytes (uint64) <inMeasTime>
-	//std::string TagHEADEREND = "Header_End                      ÿÿÿÿ ÿÿ        "; // no change
+	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ï¿½ï¿½ï¿½ï¿½      ";	// HydraHarp, T2
+	//std::string TagNUMREC = "TTResult_NumberOfRecords        ï¿½ï¿½ï¿½ï¿½  "; // + append 8 bytes (uint64) <NcntsTOT>
+	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ï¿½ï¿½ï¿½ï¿½   ï¿½-ï¿½ï¿½ï¿½q="; // 1 ps == standard
+	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ï¿½ï¿½ï¿½ï¿½  "; // + append 8 bytes (uint64) <inMeasTime>
+	//std::string TagHEADEREND = "Header_End                      ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½        "; // no change
 
 	// Now: need to append Idx (int32_t), Type (uint32_t), and Value (8 bytes).
 	std::string TagRECTYPE = "TTResultFormat_TTTRRecType";	// HydraHarp, T2
@@ -1506,7 +1511,14 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	// will be updated during the file processing...
 
 	// QQQQQQQQQQQQQQQQQQQQ
-	int BUBnFiles = (int)trunc( (1.0e-3) * inMeasTime / TimeToSplitSEC);
+	
+	// int BUBnFiles = (int)trunc( (1.0e-3) * inMeasTime / TimeToSplitSEC);
+	int BUBnFiles;
+	BUBnFiles = (int)(std::ceil( (double)(1.0e-3) * inMeasTime / TimeToSplitSEC));
+
+	cout << "BUBnFiles: " << BUBnFiles << " \tinMeasTime: " << inMeasTime << " \tTimeToSplitSEC: ";
+	cout << TimeToSplitSEC << std::endl;
+
 	int BUBcurrFileN = 1;
 	std::string BUBcurrOutputFileName; // will be used with <fileOutName>
 	std::string BUBtmpName; // will be used with <fileOutName>
@@ -1575,16 +1587,16 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	// TagRECTYPE includes first 16 bytes of the header.
 	// When all the fields from the header are parsed, can be changed to standard PQ notation.
-	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ÿÿÿÿ      ";	// HydraHarp, T2
+	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ï¿½ï¿½ï¿½ï¿½      ";	// HydraHarp, T2
 
 	// Very bad solution: cast all the others to tyInt8 = 0x10000008, //
 
 	std::string TagPREHEADER16bytes = "***AUREA FILE***";
-	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ÿÿÿÿ      ";	// HydraHarp, T2
-	//std::string TagNUMREC = "TTResult_NumberOfRecords        ÿÿÿÿ  "; // + append 8 bytes (uint64) <NcntsTOT>
-	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ÿÿÿÿ   ê-™—q="; // 1 ps == standard
-	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ÿÿÿÿ  "; // + append 8 bytes (uint64) <inMeasTime>
-	//std::string TagHEADEREND = "Header_End                      ÿÿÿÿ ÿÿ        "; // no change
+	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ï¿½ï¿½ï¿½ï¿½      ";	// HydraHarp, T2
+	//std::string TagNUMREC = "TTResult_NumberOfRecords        ï¿½ï¿½ï¿½ï¿½  "; // + append 8 bytes (uint64) <NcntsTOT>
+	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ï¿½ï¿½ï¿½ï¿½   ï¿½-ï¿½ï¿½ï¿½q="; // 1 ps == standard
+	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ï¿½ï¿½ï¿½ï¿½  "; // + append 8 bytes (uint64) <inMeasTime>
+	//std::string TagHEADEREND = "Header_End                      ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½        "; // no change
 
 	// Now: need to append Idx (int32_t), Type (uint32_t), and Value (8 bytes).
 	std::string TagRECTYPE = "TTResultFormat_TTTRRecType";	// HydraHarp, T2
