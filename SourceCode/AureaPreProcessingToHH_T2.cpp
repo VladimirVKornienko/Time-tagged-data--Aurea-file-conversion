@@ -6,12 +6,23 @@
 */
 
 
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
+//		Stage1 (+) splits the file in three + extracts PSin1Tag, MeasTime, Nch1, Nch2 from the file.		//
+//		Stage2 (+) gets some of those parameters as inputs, and makes a *.PTU file in reqired format.		//
+//		Stage3 (not ready / unstable) is same to Stage2, but splits the initial file in chunks of			//
+//																		<TimeToSplitSEC> time chunks each.	//
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
+
+
+
+
+
 // VKORN_TUESDAY >>
 // <<< Label for the recent changes in file I/O: from "write" to "<<".
 
 
 #define AUREABytesInATagName	32	// for formatting the header file.
-#define AUREAGlobalResolution 1.0e-12 // in seconds; universal, everywhere here...
+#define AUREAGlobalResolution	1.0e-12 // in seconds; universal, everywhere here...
 
 // Nov.20: for "Stage2", added rounding to the nearest ps value: value = round( value * 1000.0 ) / 1000.0;
 
@@ -69,12 +80,6 @@ using namespace std;
 
 
 
-//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
-//		Stage1 splits the file in three + extracts PSin1Tag, MeasTime, Nch1, Nch2 from the file.		//
-//		Stage2 gets some of those parameters as inputs, and makes a *.PTU file in reqired format.		//
-//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
-
-
 //int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1, const char* fileOutNameCh2,
 //	const char* fileOutNameHEADER, double* outAureaPSin1Tag,
 //	uint64_t* outMeasTime, uint64_t* outNCh1, uint64_t* outNCh2, uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped)
@@ -91,15 +96,19 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	//		Also, skip bad entries (with either '0' or very large values
 	//				(5.58344e+7 and 5.58345e+7 for 625 kHz freq (divider 1 = none)) ). //
 	
+	//   >>>   DEFINE THOSE !!  >>>   //
+	
 	const char myFreqLine[] = "%   Sync freq:";	// header prefix before the Sync. freq.
-	double myUpperDiscrLevelFraction = 1.00; // a fraction of the (1/freq), will be calculated later //
+	double myUpperDiscrLevelFraction = 1.00;	// a fraction of the (1/freq), will be calculated later //
+	double myLowerDiscrLevel = 1.0e-6;			// entered manually
 		
 	//   <<<   DEFINE THOSE !!  <<<   //
 
 	// uint64_t outMeasTime = 0;	// Total measurement time in ps, to be returned;
 	// OR IN MILLISECONDS??!? //
 
-	uint64_t ch1Nskipped = 0;
+	uint64_t ch1Nskipped = 0;		// bad records not passing the discriminator
+									// see also <myUpperDiscrLevel> and 
 	uint64_t ch2Nskipped = 0;
 	// uint64_t NtotalAll = 0;
 	uint64_t NtotCh1 = 0;
@@ -345,7 +354,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			// process the string
 			
 			// REMOVING BAD RECORDS: //
-			if ((ch1time > 1e-6) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+			if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
 			{
 				// VKORN_TUESDAY >>
 				// OLD:
@@ -377,7 +386,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 				ch1Nskipped = ch1Nskipped + ((uint64_t)1);
 			}
 
-			if ((ch2time > 1e-6) && (ch2time < myUpperDiscrLevel))
+			if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel))
 			{
 				// VKORN_TUESDAY >>
 				// OLD:
@@ -456,7 +465,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
 				
-				if ((ch2time > 1e-6) && (ch2time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
 				{
 					// VKORN_TUESDAY >>
 					// OLD: binary
@@ -511,7 +520,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			numArgsRead = sscanf(line.c_str(), "%llu %lf", &ch1tag, &ch1time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
-				if ((ch1time > 1e-6) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
 				{
 					// VKORN_TUESDAY >>
 					// OLD:
