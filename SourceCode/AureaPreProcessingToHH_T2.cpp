@@ -87,7 +87,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	const char* fileOutNameHEADER, double* outAureaPSin1Tag,
 	double* outMeasTime, uint64_t* outNCh1, uint64_t* outNCh2, uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped)
 
-	// double outMeasTime;	// Total measurement time in milliseconds, to be returned;
+	// outMeasTime : Total measurement time in milliseconds, to be returned.
 
 {
 	//	*	*	*	*	*	*	*	*	//
@@ -434,15 +434,9 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	// i++; // overflow DEBUG control //
 	}
 	
-	// VKORN_TUESDAY >>
-	// VKORN DESPERATE FLAG >>
-	// fileOut1.flush();
-	// fileOut2.flush();
 	fflush(fileOut1);
 	fflush(fileOut2);
-	// << VKORN DESPERATE FLAG
-	// << VKORN_TUESDAY
-
+	
 	// part 3 :: 2 numbers total, only one channel left.
 	runFlag = true;
 
@@ -559,32 +553,24 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		}
 	}
 
+	*outNCh1 = NtotCh1;
+	*outNCh2 = NtotCh2;
+	*OUTch1Nskipped = ch1Nskipped;
+	*OUTch2Nskipped = ch2Nskipped;
+	
+	*outMeasTime = ((1.0 / myAureaFreq) * (double)maxTAG) * (1.0e+3); // ms
+	// *outMeasTime = llround(ceil(    ((1.0 / myAureaFreq) * maxTAG)   * (1.0e+3)   )); // ms
+	// changed to double due to faulty operations at small acquisition times.
+
+	// 17.12.2021: removed this - more precise calculation of the measurement time >>>
 	maxTAG = std::max(ch1LastTag, ch2LastTag);
 	maxTAG++;
 	// cout << "Of " << ch1LastTag << " and " << ch2LastTag << " , max (+1) chosen: " << maxTAG << std::endl;
-	   
-	*outNCh1 = NtotCh1;
-	*outNCh2 = NtotCh2;
 
-	// cout << std::endl << "Counts in Ch.1: " << NtotCh1 << " ; \tCounts in Ch.2: " << NtotCh2 << std::endl;
-	// cout << "Total counts (N_ch1 + N_ch2): " << (NtotCh1+ NtotCh2) << std::endl;
-	// cout << std::endl << "Total counts skipped (zero or too large):" << std::endl;
-	// cout << "Ch.1: " << ch1Nskipped << " \t Ch.2: " << ch2Nskipped << std::endl;
+	// YUCKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK //
 
-	*OUTch1Nskipped = ch1Nskipped;
-	*OUTch2Nskipped = ch2Nskipped;
+	// <<<<
 
-	// CURRENTLY, I BELIEVE THE TIME TO BE IN MILLISECONDS //
-	// *outMeasTime = llround(((1.0 / myAureaFreq) * maxTAG) * 1e+12); // ps
-	
-	// VKORN_TUESDAY >>
-	// *outMeasTime = llround(ceil(    ((1.0 / myAureaFreq) * maxTAG)   * (1.0e+3)   )); // ms
-	
-	*outMeasTime = ((1.0 / myAureaFreq) * maxTAG) * (1.0e+3); // ms
-	// << VKORN_TUESDAY
-
-	// cout << "Max time (in milliseconds) is " << *outMeasTime << std::endl;
-	// from <readPTU>: acq_time(int) : measurement acquisition time in picoseconds
 
 	// VKORN DESPERATE FLAG >>
 	// fileOut1.flush();
