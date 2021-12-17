@@ -87,6 +87,8 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	const char* fileOutNameHEADER, double* outAureaPSin1Tag,
 	double* outMeasTime, uint64_t* outNCh1, uint64_t* outNCh2, uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped)
 
+	// double outMeasTime;	// Total measurement time in milliseconds, to be returned;
+
 {
 	//	*	*	*	*	*	*	*	*	//
 	//	*		  PROCESSOR			*	//
@@ -96,29 +98,25 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	//		Also, skip bad entries (with either '0' or very large values
 	//				(5.58344e+7 and 5.58345e+7 for 625 kHz freq (divider 1 = none)) ). //
 	
-	//   >>>   DEFINE THOSE !!  >>>   //
-	
+	//   >>>   DEFINE THESE !!  >>>   //
 	const char myFreqLine[] = "%   Sync freq:";	// header prefix before the Sync. freq.
-	double myUpperDiscrLevelFraction = 1.00;	// a fraction of the (1/freq), will be calculated later //
+	double myUpperDiscrLevelFraction = 1.00;	// a fraction of the (1/freq), will be calculated later
+												// all delays above that value will be treated as erroneous records.
+
 	double myLowerDiscrLevel = 1.0e-6;			// entered manually
-		
-	//   <<<   DEFINE THOSE !!  <<<   //
+	//   <<<   DEFINE THESE !!  <<<   //
 
-	// uint64_t outMeasTime = 0;	// Total measurement time in ps, to be returned;
-	// OR IN MILLISECONDS??!? //
+	uint64_t ch1Nskipped = 0;
+	uint64_t ch2Nskipped = 0;		// bad records not passing the discriminator
+									// see also <myUpperDiscrLevel> and <myLowerDiscrLevel>
 
-	uint64_t ch1Nskipped = 0;		// bad records not passing the discriminator
-									// see also <myUpperDiscrLevel> and 
-	uint64_t ch2Nskipped = 0;
-	// uint64_t NtotalAll = 0;
 	uint64_t NtotCh1 = 0;
 	uint64_t NtotCh2 = 0;
 	
 	double myUpperDiscrLevel = 0; // ns (!) // Will mainly be used for checking the wrong values of Times... //
-	// unsigned int myAureaFreq = 0; // to be read later from the file header;
 	double myAureaFreq = 0; // to be more flexible... though unsigned long should be enough.
 
-	// all delays above that value will be treated as erroneous records. //
+	
 	
 
 	// VKORN_TUESDAY >>
@@ -378,7 +376,6 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 				ch1LastTag = ch1tag;
 				
-				// NtotalAll++;
 				NtotCh1 = NtotCh1 + ((uint64_t)1);
 			}
 			else
@@ -409,7 +406,6 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 				ch2LastTag = ch2tag;
 				
-				// NtotalAll++;
 				NtotCh2 = NtotCh2 + ((uint64_t)1);
 			}
 			else
@@ -489,7 +485,6 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 					
 					ch2LastTag = ch2tag;
 
-					//NtotalAll++;
 					NtotCh2 = NtotCh2 + ((uint64_t)1);
 				}
 				else
@@ -544,7 +539,6 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 					ch1LastTag = ch1tag;
 
-					//NtotalAll++;
 					NtotCh1 = NtotCh1 + ((uint64_t)1);
 				}
 				else
