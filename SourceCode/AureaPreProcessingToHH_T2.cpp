@@ -1496,7 +1496,8 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 
 
 
-
+// ??? why is nOVFLmarkersESTIMATE value (that is output every time) changes?
+// it should be constant, from the code...
 
 
 
@@ -1525,7 +1526,10 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	uint64_t nOVFLmarkersESTIMATE = (uint64_t)(trunc(
 		(inMeasTime / ((double)BUBnFiles))	* 1.0e-3 / ((double)myOverflowVal * 1.0e-12)
-													));
+	));
+	
+	// some demo code changes...
+
 	*OUTnOVFLmarkersESTIMATE = nOVFLmarkersESTIMATE;
 
 	// open files >> //
