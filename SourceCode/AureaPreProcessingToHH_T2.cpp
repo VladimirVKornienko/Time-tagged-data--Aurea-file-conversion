@@ -280,6 +280,13 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	uint64_t ch2tag = 0;
 	double ch2time = 0;
 
+	// 20.12.2021: VKORN >>>
+	uint64_t PREVch1tag = 0;
+	double PREVch1time = 0;
+	uint64_t PREVch2tag = 0;
+	double PREVch2time = 0;
+	// <<<<
+
 	// first record - parse manually, from an std::string
 	// using StringStream
 
@@ -336,6 +343,14 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	while (runFlag)
 		// new line is read from file at the very end of this 'while' loop.;
 	{
+		// 20.12.2021: VKORN >>   Check if the tags are monotonic.
+		// at first step: zeroes.
+		PREVch1tag = ch1tag;
+		PREVch1time = ch1time;
+		PREVch2tag = ch2tag;
+		PREVch2time = ch2time;
+		// <<<
+		
 		// unsigned long long int == "%llu", double in e-format == "%le". // (I hope!) //
 		// numArgsRead = sscanf(line, "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);
 		numArgsRead = sscanf(line.c_str(), "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);		
@@ -353,7 +368,8 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			// process the string
 			
 			// REMOVING BAD RECORDS: //
-			if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+			if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel) &&
+				(  (ch1tag > PREVch1tag) || ((ch1tag == PREVch1tag)&&(ch1time > PREVch1time))) )	// from 0.001 ps to UpperDiscrLevel //
 			{
 				// VKORN_TUESDAY >>
 				// OLD:
@@ -384,7 +400,8 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 				ch1Nskipped = ch1Nskipped + ((uint64_t)1);
 			}
 
-			if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel))
+			if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel) &&
+				(  (ch2tag > PREVch2tag) || ((ch2tag == PREVch2tag)&&(ch2time > PREVch2time))) )
 			{
 				// VKORN_TUESDAY >>
 				// OLD:
@@ -421,15 +438,18 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			// << read a new line //
 		}
 		else { // stop processing; determine the channel (1 or 2); then continue to part 3;
-			if (numArgsRead == 2)
-			{
+			
+			// 20.12.2021: just proceed to processing 2 arguments, if needed.
+			
+			// if (numArgsRead == 2)
+			// {
 				runFlag = false;
-			}
-			else
-			{
-				cout << "unknown record encountered (stage 2), aborting..." << std::endl;
-				runFlag = false;
-			}
+			// }
+			// else
+			// {
+			// 	cout << "unknown record encountered (stage 2), aborting..." << std::endl;
+			// 	runFlag = false;
+			// }
 		}
 	
 	// i++; // overflow DEBUG control //
@@ -452,11 +472,17 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		// while ((runFlag) && (i < 5000)) // << DEBUG << //
 		while (runFlag)
 		{
+			// 20.12.2021: VKORN: for checking if monotonic:
+			PREVch2tag = ch2tag;
+			PREVch2time = ch2time;
+			// <<<
+
 			numArgsRead = sscanf(line.c_str(), "%llu %lf", &ch2tag, &ch2time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
 				
-				if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel) &&
+					(  (ch2tag > PREVch2tag) || ((ch2tag == PREVch2tag)&&(ch2time > PREVch2time))) )	// from 0.001 ps to UpperDiscrLevel //
 				{
 					// VKORN_TUESDAY >>
 					// OLD: binary
@@ -507,10 +533,16 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		// while ((runFlag) && (i < 5000)) // << DEBUG << //
 		while (runFlag)
 		{
+			// 20.12.2021: VKORN: for checking if monotonic:
+			PREVch1tag = ch1tag;
+			PREVch1time = ch1time;
+			// <<<
+
 			numArgsRead = sscanf(line.c_str(), "%llu %lf", &ch1tag, &ch1time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
-				if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel) &&
+						(  (ch1tag > PREVch1tag) || ((ch1tag == PREVch1tag)&&(ch1time > PREVch1time))) )	// from 0.001 ps to UpperDiscrLevel //
 				{
 					// VKORN_TUESDAY >>
 					// OLD:
