@@ -197,11 +197,16 @@ int main(int argc, char ** argv)
 
 	uint32_t helpVarCheckConversion = 0;
 	helpVarCheckConversion = ((uint32_t)1) & (~(((uint32_t)15) << 28));
-	cout << "Check THAT CODE LINE (1+mask0000): >" << std::bitset<64>(helpVarCheckConversion) << std::endl;
-	helpVarCheckConversion = ( (((uint32_t)15) << 28)| (uint32_t)1) & (~(((uint32_t)15) << 28));
-	cout << "Check THAT CODE LINE (1+mask1111): >" << std::bitset<64>(helpVarCheckConversion) << std::endl;
+	cout << "Check THAT CODE LINE (1+mask0000): >" << std::endl << std::bitset<64>(helpVarCheckConversion) << std::endl;
+	helpVarCheckConversion = ( (((uint32_t)15) << 28) | (uint32_t)1) & (~(((uint32_t)15) << 28));
+	cout << "Check THAT CODE LINE (1+mask1111): >" << std::endl << std::bitset<64>(helpVarCheckConversion) << std::endl;
+	helpVarCheckConversion =  ((((uint32_t)15) << 28) | (uint32_t)1);
+	cout << "before applying '&' (1+mask1111): >" << std::endl << std::bitset<64>(helpVarCheckConversion) << std::endl;
 
 	cout << std::endl << "Stage 1. Splitting the file in three (header, ch1, ch2):" << std::endl << std::endl;
+
+
+	
 
 	b = PreProcessAureaDataStage1(fname01in.c_str(), fname02out1.c_str(), fname03out2.c_str(),
 		fname03out3header.c_str(),
@@ -226,11 +231,11 @@ int main(int argc, char ** argv)
 	//	fname03out2.c_str(), fname03out3header.c_str(), dPSin1Tag,
 	//	MeasTime, (NcntsCh1+NcntsCh2+MAINskippedCh1+MAINskippedCh2), &MAINnOVFLmarkersESTIMATE, &MAINnOVFLmarkersREAL);
 
-	/*
-	b = PreProcessAureaDataStage2(fname04result.c_str(), fname02out1.c_str(),
-		fname03out2.c_str(), fname03out3header.c_str(), dPSin1Tag,
-		MeasTime, NcntsCh1, NcntsCh2, &MAINnOVFLmarkersESTIMATE, &MAINnOVFLmarkersREAL);
-	*/
+	
+	// b = PreProcessAureaDataStage2(fname04result.c_str(), fname02out1.c_str(),
+	//	fname03out2.c_str(), fname03out3header.c_str(), dPSin1Tag,
+	//	MeasTime, NcntsCh1, NcntsCh2, &MAINnOVFLmarkersESTIMATE, &MAINnOVFLmarkersREAL);
+	
 
 	
 	// double SECONDStoSPLIT = 60.0; // seconds
@@ -243,6 +248,19 @@ int main(int argc, char ** argv)
 
 	// << VKORN DESPERATE FLAG
 
+	cout << "b == " << b << std::endl;
+
+	
+
+	cout << "performing back-conversion:" << std::endl;
+	cout << "File name: " << fname04result.c_str() << std::endl;
+
+	b = ConvertPTUtoAUREA(
+	"X:\\VKornBmb\\04 LabNew\\04a AALTO\\QIllum_unique_Bamboo\\2021_10_23 Aurea Histo Proc AND MORE\\5 newlife cpp\\02 cpp Aurea codes\\TestData\\test_out1.dat",
+	"X:\\VKornBmb\\04 LabNew\\04a AALTO\\QIllum_unique_Bamboo\\2021_10_23 Aurea Histo Proc AND MORE\\5 newlife cpp\\02 cpp Aurea codes\\TestData\\back_ch1.txt",
+	"X:\\VKornBmb\\04 LabNew\\04a AALTO\\QIllum_unique_Bamboo\\2021_10_23 Aurea Histo Proc AND MORE\\5 newlife cpp\\02 cpp Aurea codes\\TestData\\back_ch2.txt"
+	);
+	
 	cout << "b == " << b << std::endl;
 
 	return 0;

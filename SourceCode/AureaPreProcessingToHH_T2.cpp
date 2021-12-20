@@ -2355,13 +2355,15 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 		return 1;
 	}
 
+	fseek(fileInHandle, 256, SEEK_SET);
+	// ToDo: replace with finding the header end... ;
 
 	bool runFlag = true;
 	int	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
 
-	std::stringstream issTMP;
+	std::stringstream ossTMP;
 	std::string line = "initial_value";
-	issTMP.str(line);
+	ossTMP.str(line);
 
 	uint64_t currTAG = 0;		// reading from file, converting to tags and times
 	double currTIME = 0;
@@ -2428,17 +2430,18 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 
 			// output to file:
 			// sprintf(line.c_str(), "\t%d\t%f\n", currTAG, currTIME);
-			issTMP << "\t" << currTAG << "\t" << currTIME << std::endl;
+			ossTMP.str("");
+			ossTMP << currTAG << "\t" << currTIME << std::endl;
 			
-			if (PTUchannel == 1)
+			if (PTUchannel == 0)
 			{
 				// Ch.1
-				fileOutCh1AUREA << std::endl << line.c_str();
+				fileOutCh1AUREA << ossTMP.str();
 			}
 			else
 			{
 				// Ch.2
-				fileOutCh2AUREA << std::endl << line.c_str();
+				fileOutCh2AUREA << ossTMP.str();
 			}
 
 		}	// << regular event
@@ -2448,9 +2451,12 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 
 		fscanfSTATUS = fread(&PTUrecord, helpSizeUINT32, unityForFWRITE, fileInHandle);
 		
+		// cout << fscanfSTATUS << " ";
+
 		//if (!fileInHandle.good())
 		// if (fileInHandle.eof())
-		if (fscanfSTATUS == EOF)
+		// if (fscanfSTATUS == EOF)
+		if (!fscanfSTATUS)
 		{
 			runFlag = false;
 		}
