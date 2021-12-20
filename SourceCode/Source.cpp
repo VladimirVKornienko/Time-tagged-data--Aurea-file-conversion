@@ -221,7 +221,7 @@ int main(int argc, char ** argv)
 	cout << "Ch.1: " << MAINskippedCh1 << " \t Ch.2: " << MAINskippedCh2 << std::endl;
 
 	cout << std::endl << std::endl << "[REDUNDANT!] waiting 1 second for the files to sync..." << std::endl << std::endl;
-	Sleep(1000);
+	Sleep(200);
 
 	cout << std::endl << "Starting a new part - combining 3 files into one (HH T2 format)(Stage 2):" << std::endl << std::endl;
 	cout << "myOverflowVal == " << myOverflowVal << std::endl;
@@ -239,7 +239,8 @@ int main(int argc, char ** argv)
 
 	
 	// double SECONDStoSPLIT = 60.0; // seconds
-	double SECONDStoSPLIT = MeasTime * 1e3; // seconds
+	double SECONDStoSPLIT = MeasTime * 1e-3; // seconds
+
 
 	b = PreProcessAureaDataStage3splitter(SECONDStoSPLIT, fname04result.c_str(), fname02out1.c_str(),
 		fname03out2.c_str(), fname03out3header.c_str(), dPSin1Tag,

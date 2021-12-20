@@ -6,6 +6,15 @@ C/C++ based.
 Target system: Windows 7 x64.
 Should be platform-independent, but tested on Win7 x64 and Win10 x64 only.
 
+
+NB!    >>>>>>
+
+Found a bug:: subtracting two uint64 values (before multiplying them by double)
+
+auxTimePS = ((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime);
+
+<<<<<    !NB
+
 Current tasks:
 
 (-1) Create reverse wrapper (ptu -> Aurea formats)
@@ -54,5 +63,18 @@ int _fseeki64(
 
 (5.iv) Change measurement time calculation to a precise one (add Time, not only Tag):
 "AureaPreProcessingToHH_T2.cpp" -> at "// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK"
+
+
+(5.v) Stage2 processor:: make changes from Stage3.
+Most importantly, 'while' loop for overflow events.
+
+
+(5.vi) implement normal type casting between {picoseconds; overflows} and
+					{tags; times}.
+
+(5.vii) in stage3, changed <convertedCH2timePS> from uint32_t to double.
+Conversion is now performed at the very last step!
+
+(5.viii) [stage3] ToDo: replace "ch2 left" with fscanfSTATUS == EOF (-1).
 
 [(End of ReadMe file.)]
