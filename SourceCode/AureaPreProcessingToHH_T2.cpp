@@ -2293,4 +2293,260 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 
 
+
+
+
+
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
+//	*				Reverse converter (for checking the consistency...)			*	//
+//	*																			*	//
+//	*									[ Stage 4. ]							*	//
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
+
+
+int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2
+
+	// 20.12.: header processing will be added later.
+	// , const char* fileOutNameCh2
+	// , const char* fileOutNameHEADER
+
+)
+
+{
+	// I/O help "constants":
+	std::size_t	helpSizeUINT32 = sizeof(uint32_t);
+	std::size_t	helpSizeDOUBLE = sizeof(double);
+	std::size_t	helpSizeUINT64 = sizeof(uint64_t);
+	std::size_t unityForFWRITE = 1;
+
+	// channel masks:
+#ifdef AureaReverseChannelAndTimeData
+	uint32_t	myCh1Mask = ((uint32_t)0); // number of channel (from 0) NOT shifted by N_bits_TimeTag to the left.
+	uint32_t	myCh2Mask = ((uint32_t)1); // number of channel (from 0) NOT shifted by N_bits_TimeTag to the left.
+	uint32_t	myOVFLMask = ((uint32_t)15);  // LSB;	// = 28 times 0b0, then 0b1111.
+#else
+	uint32_t	myCh1Mask = ((uint32_t)0) << 28; // number of channel (from 0) shifted by N_bits_TimeTag to the left.
+	uint32_t	myCh2Mask = ((uint32_t)1) << 28; // number of channel (from 0) shifted by N_bits_TimeTag to the left.
+	uint32_t	myOVFLMask = ((uint32_t)15) << 28; // MSB;	// = 0b1111 + 28 more bit values.
+#endif
+
+	// prepare files:
+	std::ofstream fileOutCh1AUREA(fileOutCh1);
+	if (!fileOutCh1AUREA.is_open())
+		{
+			cout << "Error opening file for output (Ch.1)." << std::endl;
+			return 1;
+		}
+	
+	std::ofstream fileOutCh2AUREA(fileOutCh2);
+	if (!fileOutCh2AUREA.is_open())
+		{
+			cout << "Error opening file for output (Ch.2)." << std::endl;
+			fileOutCh1AUREA.close();
+			return 1;
+		}
+
+	FILE* fileInHandle;
+	fileInHandle = fopen(fileInNamePTU, "rb");
+	if (fileInHandle == NULL) {
+		fileOutCh1AUREA.close();
+		fileOutCh2AUREA.close();
+		cout << "Error opening input file." << std::endl;
+		return 1;
+	}
+
+
+	bool runFlag = true;
+
+
+	std::istringstream issTMP;
+	std::string line = "initial_value";
+	issTMP.str(line);
+
+	uint64_t ch1tag = 0;
+	double ch1time = 0;
+	uint64_t ch2tag = 0;
+	double ch2time = 0;
+
+	uint64_t lastOVFLtag = 0;
+	double lastOVFLtime = 0.0;
+
+	uint32_t PTUrecord = 0;	// will be used for extracting the data from PTU-file.
+
+	const uint64_t T2WRAPAROUND = 210698240;	// ToDo: change to 2^28 here and in pre-processor (Aurea).
+	
+	int PTUchannel = 0;		
+	uint32_t PTUtimePS = 0;	// number of picoseconds, as read from the record.
+	
+	double PTUcurrTimeExcessPS = 0.0;	// increased when overflow marker in PTU file,
+										// decreased when (% + time) > myPSin1tag.
+										// Can be negative.
+
+	// myUpperDiscrLevel = (1.0 / myAureaFreq) * myUpperDiscrLevelFraction * 1e+9; // ns
+	myPSin1tag = (1.0 / 625000) * 1e+12; // ps
+	// ToDo:
+	// manually programmed to 625 kHz
+	// replace with input from main program (later)
+
+
+	fread(&PTUrecord, helpSizeUINT32, unityForFWRITE, fileInHandle);
+	if (!fileInHandle.good())
+		{
+			runFlag = false;
+		}
+	while (runFlag)
+	{
+		
+		
+		if ((PTUrecord >> 28) == (uint32_t)15) //this means we have a special record
+		{
+			// markers not implemented //
+			
+			// PTUtimePS = 0;	>> not needed now...
+			// PTUchannel = -1;	>> also not needed...
+			PTUcurrTimeExcessPS = PTUcurrTimeExcessPS + (double)T2WRAPAROUND;
+			// unwrap the time tag overflow		
+		}
+		else
+		{
+			// PTUtimePS = *oflcorrection + (record & (~(((uint32_t)15) << 28)));
+			PTUtimePS = record & (~(((uint32_t)15) << 28));
+			*channel = (int)(record >> 28);	
+		}
+
+
+		// convertedCH2timePS = (uint32_t)round(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
+
+		// 1e3: ns -> ps //
+		// AVERAGE TO UNITS OF PICOSECONDS //
+
+		
+
+
+
+		// sprintf(line.c_str(), "\t%d\t%f\t%d\t%f", ch1tag, ch1time, ch2tag, ch2time);
+
+			
+
+		
+			// Overflow check:
+			// OLD: // if (convertedCH2timePS > myOverflowVal)
+			// NOW SHOULD BE CAPABLE OF ADDING MULTIPLE OVERFLOW EVENTS //
+			// WITHOUT RUINING UP THE TIME VALUE //
+			while (convertedCH2timePS > myOverflowVal)
+			{
+				// increase OVFL marker, recalculate value
+				// hlpOVFLtrunc = ((uint64_t)trunc(  ((double)myOverflowVal) / inAureaPSin1Tag  ));
+				// << defined before <while> loop.
+
+#ifdef AureaProcessorPart2OverflowDebuggingMessages
+				cout << "old EVENT time: " << convertedCH2timePS << std::endl;
+				cout << "old OVFL tag = " << lastOVFLtag << " \t" << "old OVFL time = " << lastOVFLtime << std::endl;
+#endif
+				lastOVFLtag = lastOVFLtag + hlpOVFLtrunc;
+				// OLD: // lastOVFLtime = lastOVFLtime + (1e-3) * (((double)myOverflowVal) - (hlpOVFLtrunc * inAureaPSin1Tag));
+				
+				// lastOVFLtime = lastOVFLtime + (1e-3)*(((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag));
+				// Nov.20: round to <ps> level:
+				lastOVFLtime = (1.0e-3) * round(lastOVFLtime*(1.0e3) + (((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag)));
+				// 1e-3: ps -> ns;
+				// NOW: AVERAGED TO UNITS OF PICOSECONDS //
+
+				if (lastOVFLtime > (inAureaPSin1Tag * (1.0e-3))) // can occur only once...
+				{
+					lastOVFLtag = lastOVFLtag + (uint32_t)1;
+					// lastOVFLtime = lastOVFLtime - (inAureaPSin1Tag * (1e-3));
+					lastOVFLtime = (1.0e-3) * round(lastOVFLtime*(1.0e3) - inAureaPSin1Tag);
+					// NOW: AVERAGED TO UNITS OF PICOSECONDS //
+				}
+				
+#ifdef AureaProcessorPart2OverflowDebuggingMessages
+				cout << "new OVFL tag = " << lastOVFLtag << " \t" << "new OVFL time = " << lastOVFLtime << std::endl;
+#endif
+				// Write an overflow event:
+				convertedCH2timePS = ((uint32_t)0) | myOVFLMask;
+				
+				// VKORN_TUESDAY >>
+				// OLD:
+				// fileOutHandle.write((const char*)& convertedCH2timePS, helpSizeUINT32); // OVFL marker written;
+
+				// NEW: text only ((
+				// fileOutHandle << convertedCH2timePS;
+
+				// NEW: binary:
+				// VKORN DESPERATE FLAG >>
+				// fileOutHandle.write(reinterpret_cast<char*>(&convertedCH2timePS), helpSizeUINT32); // OVFL marker written;
+				fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
+				// << VKORN DESPERATE FLAG
+				// << VKORN_TUESDAY
+				
+				// increase the counter of overflow events;
+				nOVFLmarkersREAL = nOVFLmarkersREAL + ((uint64_t)1);
+
+				// decrease time by 1 "overflow value":
+				// convertedCH2timePS = (uint32_t)lround(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
+				convertedCH2timePS = (uint32_t)round(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
+				
+				// 1e-3: ps -> ns;
+#ifdef AureaProcessorPart2OverflowDebuggingMessages
+				cout << "new EVENT time: " << convertedCH2timePS << std::endl;
+#endif
+
+			}
+
+			// Apply the channel mask:
+#ifdef AureaReverseChannelAndTimeData
+			convertedCH2timePS = (convertedCH2timePS << 4) | myCh2Mask; // first Time, then Channel
+#else
+			convertedCH2timePS = convertedCH2timePS | myCh2Mask; // first Channel (MSB), then Time
+#endif
+			
+			// fileOutHandle << convertedCH2timePS;
+			// VKORN_TUESDAY >>
+			// OLD:
+			// fileOutHandle.write((const char*)&convertedCH2timePS, helpSizeUINT32);
+
+			// NEW: text only ((
+			// fileOutHandle << convertedCH2timePS;
+
+			// NEW: binary
+			// VKORN DESPERATE FLAG >>
+			//fileOutHandle.write(reinterpret_cast<char*>(&convertedCH2timePS), helpSizeUINT32);
+			fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
+			// << VKORN DESPERATE FLAG
+			// VKORN_TUESDAY >>
+
+			// Get new value from file for CH2:  (mark file end if needed:)
+			//if (fileInCh2Handle >> ch2tag >> ch2time)
+
+			// VKORN_TUESDAY >>
+			// fileInCh2Handle.read((char*)& ch2tag, helpSizeUINT64);
+			// fileInCh2Handle.read((char*)& ch2time, helpSizeDOUBLE);
+			
+			// fileInCh2Handle >> ch2tag;
+			// fileInCh2Handle >> ch2time;
+
+			// VKORN DESPERATE FLAG >>
+			//fileInCh2Handle.read(reinterpret_cast<char*>(&ch2tag), helpSizeUINT64);
+			//fileInCh2Handle.read(reinterpret_cast<char*>(&ch2time), helpSizeDOUBLE);
+
+			// freadRESULT = fread(&ch2time, helpSizeDOUBLE, unityForFWRITE, fileInCh2Handle);
+			fread(&PTUrecord, helpSizeUINT32, unityForFWRITE, fileInHandle);
+			if (!fileInHandle.good())
+				{
+					runFlag = false;
+				}
+			
+		}
+
+	} // while (runFlag);
+
+	// <<<<<<<<<<<<<<    unchanged 		<<<<<<<<<<<<< //
+
+	fclose(fileInHandle);
+	fileOutHandle.flush();
+	fileOutHandle.close();
+
+}
+
 // .EOF

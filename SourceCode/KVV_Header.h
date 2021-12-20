@@ -57,6 +57,14 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 // << VKORN_TUESDAY
 
 
+int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2
+
+	// 20.12.: header processing will be added later.
+	// , const char* fileOutNameCh2
+	// , const char* fileOutNameHEADER
+
+);
+
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 

@@ -195,6 +195,12 @@ int main(int argc, char ** argv)
 
 	cout << std::fixed << std::setprecision(2);
 
+	uint32_t helpVarCheckConversion = 0;
+	helpVarCheckConversion = ((uint32_t)1) & (~(((uint32_t)15) << 28));
+	cout << "Check THAT CODE LINE (1+mask0000): >" << std::bitset<64>(helpVarCheckConversion) << std::endl;
+	helpVarCheckConversion = ( (((uint32_t)15) << 28)| (uint32_t)1) & (~(((uint32_t)15) << 28));
+	cout << "Check THAT CODE LINE (1+mask1111): >" << std::bitset<64>(helpVarCheckConversion) << std::endl;
+
 	cout << std::endl << "Stage 1. Splitting the file in three (header, ch1, ch2):" << std::endl << std::endl;
 
 	b = PreProcessAureaDataStage1(fname01in.c_str(), fname02out1.c_str(), fname03out2.c_str(),
