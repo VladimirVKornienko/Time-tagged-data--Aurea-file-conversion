@@ -127,7 +127,11 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
 	// Getting total experiment time: >>
-	uint64_t	maxTAG = 0;
+	
+	// LABEL EVENING TYPES >>>
+	//uint64_t	maxTAG = 0;
+	int64_t	maxTAG = 0;
+
 	// Will be +1 after last entry. (An approximation, but quite accurate one!).
 	// <<<
 
@@ -274,17 +278,34 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		
 	// part 2:  4 numbers total, 2 channels data is present
 	
-	uint64_t ch1tag = 0;
+	// LABEL EVENING TYPES >>>
+	//
+	//uint64_t ch1tag = 0;
+	//double ch1time = 0;
+	//uint64_t ch2tag = 0;
+	//double ch2time = 0;
+
+	//// 20.12.2021: VKORN >>>
+	//uint64_t PREVch1tag = 0;
+	//double PREVch1time = 0;
+	//uint64_t PREVch2tag = 0;
+	//double PREVch2time = 0;
+	//// <<<<
+
+	int64_t ch1tag = 0;
 	double ch1time = 0;
-	uint64_t ch2tag = 0;
+	int64_t ch2tag = 0;
 	double ch2time = 0;
 
 	// 20.12.2021: VKORN >>>
-	uint64_t PREVch1tag = 0;
+	int64_t PREVch1tag = 0;
 	double PREVch1time = 0;
-	uint64_t PREVch2tag = 0;
+	int64_t PREVch2tag = 0;
 	double PREVch2time = 0;
 	// <<<<
+
+	// LABEL EVENING TYPES <<<<
+	// <<<<<<<<<<<<<<< 
 
 	// first record - parse manually, from an std::string
 	// using StringStream
@@ -316,15 +337,21 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	int numArgsRead = 0; // should be 4 at first, then switch to 2 at some moment;
 	// << ToDo (QUEST): remove at some point;
 	
-	uint64_t ch1LastTag = 0;	// used for determining the correct channel in 'part3'.	
-	uint64_t ch2LastTag = 0;
+	// LABEL EVENING TYPES >>>
+	//uint64_t ch1LastTag = 0;	// used for determining the correct channel in 'part3'.	
+	//uint64_t ch2LastTag = 0;
+	int64_t ch1LastTag = 0;	// used for determining the correct channel in 'part3'.	
+	int64_t ch2LastTag = 0;
+
 
 	// VKORN_TUESDAY >>
 	//unsigned int const cSizeOfTAG  = sizeof(uint64_t);
 	//unsigned int const cSizeOfTIME = sizeof(double);
 
 	std::size_t	cSizeOfTIME = sizeof(double);
-	std::size_t	cSizeOfTAG = sizeof(uint64_t);
+	// LABEL EVENING TYPES >>>
+	// std::size_t	cSizeOfTAG = sizeof(uint64_t);
+	std::size_t	cSizeOfTAG = sizeof(int64_t);
 	// <<< VKORN_TUESDAY
 
 	// DEBUG >>>
@@ -352,8 +379,10 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		
 		// unsigned long long int == "%llu", double in e-format == "%le". // (I hope!) //
 		// numArgsRead = sscanf(line, "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);
-		numArgsRead = sscanf(line.c_str(), "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);		
 		
+		// LABEL EVENING TYPES >>>
+		// numArgsRead = sscanf(line.c_str(), "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);		
+		numArgsRead = sscanf(line.c_str(), "%lld %lf %lld %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);
 		
 		
 		// debug message:
@@ -476,7 +505,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			PREVch2time = ch2time;
 			// <<<
 
-			numArgsRead = sscanf(line.c_str(), "%llu %lf", &ch2tag, &ch2time);
+			numArgsRead = sscanf(line.c_str(), "%lld %lf", &ch2tag, &ch2time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
 				
@@ -537,7 +566,7 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			PREVch1time = ch1time;
 			// <<<
 
-			numArgsRead = sscanf(line.c_str(), "%llu %lf", &ch1tag, &ch1time);
+			numArgsRead = sscanf(line.c_str(), "%lld %lf", &ch1tag, &ch1time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
 				if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel) &&
@@ -592,7 +621,8 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	
 	// 17.12.2021: to be removed at some point... >>>
 	maxTAG = std::max(ch1LastTag, ch2LastTag);
-	maxTAG++;
+	// maxTAG++;
+	maxTAG = maxTAG + ((int64_t)1);
 	// cout << "Of " << ch1LastTag << " and " << ch2LastTag << " , max (+1) chosen: " << maxTAG << std::endl;
 
 	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
@@ -1815,21 +1845,30 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	std::size_t	helpSizeDOUBLE = sizeof(double);
 	std::size_t	helpSizeUINT64 = sizeof(uint64_t);
 
-	uint64_t	hlpOVFLtrunc = ((uint64_t)trunc(((double)myOverflowVal) / inAureaPSin1Tag));
+	// LABEL EVENING TYPES >>>
+	//uint64_t	hlpOVFLtrunc = ((uint64_t)trunc(((double)myOverflowVal) / inAureaPSin1Tag));
+	int64_t	hlpOVFLtrunc = ((int64_t)trunc(((double)myOverflowVal) / inAureaPSin1Tag));
+
 	// aux for calculations;
 	// convert current excess time into {Tag, Time} pair.
 
 	// <<<<<<  "CONSTANTS", not to iterate in a cycle //
 
 
-	uint64_t	ch1tag;		// tags, see <inAureaPSin1Tag>
+	// LABEL EVENING TYPES >>>
+	//uint64_t	ch1tag;		// tags, see <inAureaPSin1Tag>
+	int64_t		ch1tag;		// tags, see <inAureaPSin1Tag>
 	double		ch1time;	// ns
-	uint64_t	ch2tag;		// tags, see <inAureaPSin1Tag>
+	//uint64_t	ch2tag;		// tags, see <inAureaPSin1Tag>
+	int64_t		ch2tag;		// tags, see <inAureaPSin1Tag>
 	double		ch2time;	// ns
 
 	
 	uint32_t	convertedCH1timePS; // after subtracting <lastOVFL> and converting to ps //
 	uint32_t	convertedCH2timePS;
+	// <<< // LABEL EVENING TYPES 
+
+
 	// 20.12.2021: VKORN >>>
 	double		auxTimePS;			//	ps
 									// then convertedCH_x_ := (uint32_t)round(auxTime). //
@@ -1848,7 +1887,10 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	// Used to cope with overflow events; stores the last {time,tag} for an overflow event;
 	// (add <myOverflowVal> (ps) and convert it to time and tag)
-	uint64_t	lastOVFLtag = 0;		// tags
+	
+	// LABEL EVENING TYPES >>>
+	//uint64_t	lastOVFLtag = 0;		// tags
+	int64_t		lastOVFLtag = 0;		// tags
 	double		lastOVFLtime = 0.0;		// ns
 
 	uint64_t CH1left = Ncnts1;
@@ -1859,11 +1901,9 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	lastOVFLtag = 0;		// tags
 	lastOVFLtime = 0.0;		// ns
 
-	// convertedCH1timePS = 0; // after subtracting <lastOVFL> and converting to ps //
-	// convertedCH2timePS = 0;
-	convertedCH1timePS = 0.0; // after subtracting <lastOVFL> and converting to ps //
-	convertedCH2timePS = 0.0;
-
+	convertedCH1timePS = 0; // after subtracting <lastOVFL> and converting to ps //
+	convertedCH2timePS = 0;
+	
 	// INITIALIZE TAGS AND TIMES: (NOT IN A CYCLE!)
 	fread(&ch1tag, helpSizeUINT64, unityForFWRITE, fileInCh1Handle);
 	fread(&ch1time, helpSizeDOUBLE, unityForFWRITE, fileInCh1Handle);
@@ -1877,7 +1917,9 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	
 	cout << std::endl << std::endl << "entering the output loop:" << std::endl;
 	
-	uint64_t BUBskipTAG;
+	// LABEL EVENING TYPES >>>
+	//uint64_t BUBskipTAG;
+	int64_t BUBskipTAG;
 	// Max tag number. When reached, flush the current file and then move forward.
 
 	//RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
@@ -1899,7 +1941,9 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 			return 1;
 		}
 
-		BUBskipTAG = (std::min(ch1tag, ch2tag)) + (uint64_t)round(TimeToSplitSEC / (inAureaPSin1Tag * 1.0e-12));
+		// LABEL EVENING TYPES >>>
+		// BUBskipTAG = (std::min(ch1tag, ch2tag)) + (uint64_t)round(TimeToSplitSEC / (inAureaPSin1Tag * 1.0e-12));
+		BUBskipTAG = (std::min(ch1tag, ch2tag)) + (int64_t)round(TimeToSplitSEC / (inAureaPSin1Tag * 1.0e-12));
 		// do check it every cycle...
 
 		bCh1empty = false;
@@ -1922,9 +1966,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 //OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 		
-		int qqq = 0;
-		int www = 0;
-
+		
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
 		while ((runFlag) && (i < 10))
 #else
@@ -2037,13 +2079,6 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 				while (auxTimePS > (double)myOverflowVal)
 				{
 					
-					qqq++;
-					if (qqq > 20)
-					{
-						runFlag = false;
-						cout << "error flag1 (auxTimePS > ; ch.2)" << std::endl;
-					}
-
 					// Write an overflow event:
 					convertedCH2timePS = ((uint32_t)0) | myOVFLMask;
 					fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
@@ -2067,21 +2102,13 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 						// 1e-3: ps -> ns;
 						// upd: rolled back; NOW: AVERAGED TO UNITS OF PICOSECONDS //
 
-					www = 0;
-
+					
 					while (lastOVFLtime > (inAureaPSin1Tag * (1.0e-3))) // can occur only once...
 					// I am putting a 'while' loop, just in case...
 					{
-						www++;
-						if (www > 15)
-						{
-							runFlag = false;
-							cout << "error flag2 (lastOVFLtime > ; ch.2)" << std::endl;
-						}
-						
-						www = 0;
-
-						lastOVFLtag = lastOVFLtag + (uint64_t)1;
+						// LABEL EVENING TYPES >>>
+						// lastOVFLtag = lastOVFLtag + (uint64_t)1;
+						lastOVFLtag = lastOVFLtag + (int64_t)1;
 						// 20.12.2021: VKORN: >>>
 						lastOVFLtime = lastOVFLtime - (inAureaPSin1Tag * (1e-3));
 						// lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) - inAureaPSin1Tag);
@@ -2090,12 +2117,8 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 					}
 					
 					
-					cout << auxTimePS << "\t";
-
 					// recalculate time (starting from the last overflow moment):
 					auxTimePS = ((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime);
-
-					cout << auxTimePS << std::endl;
 
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
 					cout << "new EVENT time: " << convertedCH2timePS << std::endl;
@@ -2103,8 +2126,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 				}	// while overshooting : write overflow events..
 				
-				qqq = 0; // reset for further use;
-
+				
 				// Apply the channel mask:
 #ifdef AureaReverseChannelAndTimeData
 				convertedCH2timePS = (convertedCH2timePS << 4) | myCh2Mask; // first Time, then Channel
@@ -2166,16 +2188,9 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 				// After: >>>
 				auxTimePS = ((ch1tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch1time - lastOVFLtime);
 
-				qqq = 0;
-
+				
 				while (auxTimePS > (double)myOverflowVal)
 				{
-					qqq++;
-					if (qqq > 15)
-					{
-						runFlag = false;
-						cout << "error flag3 (auxTimePS > ; ch.1)" << std::endl;
-					}
 					
 					// Write an overflow event:
 					convertedCH1timePS = ((uint32_t)0) | myOVFLMask;
@@ -2200,19 +2215,14 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 						// 1e-3: ps -> ns;
 						// upd: rolled back; NOW: AVERAGED TO UNITS OF PICOSECONDS //
 
-					www = 0;
-
 					while (lastOVFLtime > (inAureaPSin1Tag * (1.0e-3))) // can occur only once...
 					// I am putting a 'while' loop, just in case...
 					{
-						www++;
-						if (www > 15)
-						{
-							runFlag = false;
-							cout << "error flag4 (lastOVFLtime > ; ch.1)" << std::endl;
-						}
+						
 
-						lastOVFLtag = lastOVFLtag + (uint64_t)1;
+						// LABEL EVENING TYPES >>>
+						// lastOVFLtag = lastOVFLtag + (uint64_t)1;
+						lastOVFLtag = lastOVFLtag + (int64_t)1;
 						// 20.12.2021: VKORN: >>>
 						lastOVFLtime = lastOVFLtime - (inAureaPSin1Tag * (1e-3));
 						// lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) - inAureaPSin1Tag);
@@ -2220,7 +2230,6 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 						// <<<
 					}
 
-					www = 0;
 					
 					
 					// recalculate time (starting from the last overflow moment):
@@ -2231,8 +2240,6 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 #endif
 
 				}	// while overshooting : write overflow events..
-
-				qqq = 0;
 
 				// Just apply the channel mask:
 #ifdef AureaReverseChannelAndTimeData
