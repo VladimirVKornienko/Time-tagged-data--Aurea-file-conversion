@@ -2359,7 +2359,7 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 	bool runFlag = true;
 	int	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
 
-	std::istringstream issTMP;
+	std::stringstream issTMP;
 	std::string line = "initial_value";
 	issTMP.str(line);
 
@@ -2413,8 +2413,8 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 			// regular event - read, convert time, update time base marker, write to AureaFile
 			
 			// PTUtimePS = *oflcorrection + (record & (~(((uint32_t)15) << 28)));
-			PTUtimePS = record & (~(((uint32_t)15) << 28));
-			PTUchannel = (int)(record >> 28);	
+			PTUtimePS = PTUrecord & (~(((uint32_t)15) << 28));
+			PTUchannel = (int)(PTUrecord >> 28);	
 
 			// convert input data to TAGS and TIMES:
 			// each time we increment a tag (+=1), we decrement <PTUcurrTimeExcessPS> (-= myPSin1tag)
@@ -2427,7 +2427,9 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 			}
 
 			// output to file:
-			sprintf(line.c_str(), "\t%d\t%f\n", currTAG, currTIME);
+			// sprintf(line.c_str(), "\t%d\t%f\n", currTAG, currTIME);
+			issTMP << "\t" << currTAG << "\t" << currTIME << std::endl;
+			
 			if (PTUchannel == 1)
 			{
 				// Ch.1
@@ -2456,8 +2458,10 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 	} // while (runFlag);
 
 	fclose(fileInHandle);
-	fileOutHandle.flush();
-	fileOutHandle.close();
+	fileOutCh1AUREA.flush();
+	fileOutCh2AUREA.flush();
+	fileOutCh1AUREA.close();
+	fileOutCh2AUREA.close();
 
 	return 0;
 }
