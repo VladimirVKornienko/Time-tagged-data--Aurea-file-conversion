@@ -45,6 +45,11 @@
 // << uncomment for DEBUG MODE (ONLY). //
 #endif
 
+#ifndef stage4_Write_Overflow_Flags_ToFile
+#define stage4_Write_Overflow_Flags_ToFile
+// (un)comment for writing (skipping) overflow markers when de-coding back from PTU format to Aurea format.
+#endif
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2513,7 +2518,7 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 	ossTMP.str(line);
 
 	uint64_t currTAG = 0;		// reading from file, converting to tags and times
-	double currTIME = 0.0;
+	double currTIMEps = 0.0;	// ps
 	
 	uint32_t PTUrecord = 0;	// will be used for extracting the data from PTU-file.
 
@@ -2528,9 +2533,7 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 
 	
 	double myPSin1tag;
-	myPSin1tag = (1.0 / 625000.0) * 1e+12; // ps
-	// myUpperDiscrLevel = (1.0 / myAureaFreq) * myUpperDiscrLevelFraction * 1e+9; // ns
-
+	myPSin1tag = (1.0 / (double)625000) * 1e+12; // ps
 	// ToDo:
 	// manually programmed to 625 kHz
 	// replace with input from main program (later)
@@ -2555,7 +2558,14 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 			// PTUtimePS = 0;	>> not needed now...
 			// PTUchannel = -1;	>> also not needed...
 			PTUcurrTimeExcessPS = PTUcurrTimeExcessPS + (double)T2WRAPAROUND;
-			// unwrap the time tag overflow		
+			// unwrap the time tag overflow	
+
+#ifdef stage4_Write_Overflow_Flags_ToFile
+				ossTMP.str("OVFL_MARKER\n");
+				fileOutCh1AUREA << ossTMP.str();
+				fileOutCh2AUREA << ossTMP.str();
+#endif
+
 		}
 		else
 		{
@@ -2567,18 +2577,19 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 
 			// convert input data to TAGS and TIMES:
 			// each time we increment a tag (+=1), we decrement <PTUcurrTimeExcessPS> (-= myPSin1tag)
-			currTIME = ((double)PTUtimePS) + PTUcurrTimeExcessPS;
-			while (currTIME > myPSin1tag)
+			currTIMEps = ((double)PTUtimePS) + PTUcurrTimeExcessPS;
+			while (currTIMEps > myPSin1tag)
 			{
-				currTIME = currTIME - myPSin1tag;
+				currTIMEps = currTIMEps - myPSin1tag;
 				PTUcurrTimeExcessPS = PTUcurrTimeExcessPS - myPSin1tag;
-				currTAG = currTAG + 1;
+				currTAG = currTAG + (uint64_t)1;
 			}
 
 			// output to file:
 			// sprintf(line.c_str(), "\t%d\t%f\n", currTAG, currTIME);
 			ossTMP.str("");
-			ossTMP << currTAG << "\t" << currTIME << std::endl;
+			currTIMEps = currTIMEps / 1000.;
+			ossTMP << currTAG << "\t" << currTIMEps << std::endl;
 			
 			if (PTUchannel == 0)
 			{
