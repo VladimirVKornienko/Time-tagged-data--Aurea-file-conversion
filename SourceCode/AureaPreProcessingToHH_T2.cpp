@@ -1870,7 +1870,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 		fileInHEADERHandle.close();
 		fclose(fileInCh1Handle);
 		fclose(fileInCh2Handle);
-		fclose(fhOutAuxCh1);
+		fhOutAuxCh1.close();
 		cout << std::endl << "Error opening aux. output file (ch.2)." << std::endl;
 		return 1;
 	}
@@ -2325,7 +2325,7 @@ fhOutAuxCh2 << "   " << ch2tag << "   " << ch2time << std::endl;
 				fwrite(&convertedCH1timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
 
 #ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
-fhOutAuxCh1 << "   " << ch2tag << "   " << ch2time << std::endl;
+fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
 #endif
 
 				// << VKORN_TUESDAY
