@@ -15,7 +15,19 @@ auxTimePS = ((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - la
 
 <<<<<    !NB
 
+Also, fixed file read. Now, the last entry is not lost.
+( std::size_t fread(...) == 1 ? ... )
+
 Current tasks:
+
+(-3a) put all the includes in a header
+
+(-3b) split large instructions ([stage1], [stage2], ...)
+		into different *.cpp-files
+	(otherwise, very error-prone when editing / searching)
+
+(-2) In [stage1] (and partially in [stage4], change file read instructions 
+				according to [stage3], which is working fine.
 
 (-1) Create reverse wrapper (ptu -> Aurea formats)
 
@@ -76,11 +88,5 @@ Most importantly, 'while' loop for overflow events.
 Conversion is now performed at the very last step!
 
 (5.viii) [stage3] ToDo: replace "ch2 left" with fscanfSTATUS == EOF (-1).
-
-(5.ix) last entry is not shown, because of the checks that are made when outputting the files.
-ToDo: replace
-if ((CH1left > 0) && (fscanfSTATUS != EOF))
-with
-if (fscanfSTATUS != EOF)
 
 [(End of ReadMe file.)]

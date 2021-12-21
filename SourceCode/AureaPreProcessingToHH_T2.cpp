@@ -54,8 +54,12 @@
 
 #ifndef stage3_DEBUG_re_create_files_with_text_tag_time_values
 #define stage3_DEBUG_re_create_files_with_text_tag_time_values
+
 // uncomment to create 2 add. files with tags and times, as seen in stage 3.
 // (Not from PTU file, as in Stage 4).
+
+// this checks for the consistency of aux. files, generated suring the stage 1.
+// it has been proof-checked, it is working finely.
 
 // NB! works only for the last file in a batch (matter of simplicity, and enough for debugging).
 #endif
