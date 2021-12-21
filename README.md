@@ -7,7 +7,12 @@ Target system: Windows 7 x64.
 Should be platform-independent, but tested on Win7 x64 and Win10 x64 only.
 
 
-NB!    >>>>>>
+	Recent fixes:
+
+(A) Data can be non-monotonic. Now all the points which are not are skipped.
+	(very small values and very large had already had been eliminating previously.)
+
+(B) NB!    >>>>>>
 
 Found a bug:: subtracting two uint64 values (before multiplying them by double)
 
@@ -15,10 +20,13 @@ auxTimePS = ((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - la
 
 <<<<<    !NB
 
-Also, fixed file read. Now, the last entry is not lost.
+(C) Also, fixed file read. Now, the last entry is not lost.
 ( std::size_t fread(...) == 1 ? ... )
 
-Current tasks:
+
+
+
+	Current tasks:
 
 (-3a) put all the includes in a header
 

@@ -540,18 +540,23 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		// while ((runFlag) && (i < 5000)) // << DEBUG << //
 		while (runFlag)
 		{
-			// 20.12.2021: VKORN: for checking if monotonic:
-			PREVch2tag = ch2tag;
-			PREVch2time = ch2time;
-			// <<<
+			// YYYYYYYYYYYYYYYYYYYYY
+			//// 20.12.2021: VKORN: for checking if monotonic:
+			//PREVch2tag = ch2tag;
+			//PREVch2time = ch2time;
+			//// <<<
 
 			numArgsRead = sscanf(line.c_str(), "%lld %lf", &ch2tag, &ch2time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
 				
-				if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel) &&
-					(  (ch2tag > PREVch2tag) || ((ch2tag == PREVch2tag)&&(ch2time > PREVch2time))) )	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel) && (  (ch2tag > PREVch2tag) || ((ch2tag == PREVch2tag)&&(ch2time > PREVch2time))) )	// from 0.001 ps to UpperDiscrLevel //
 				{
+					// 20.12.2021: VKORN: for checking if monotonic:
+					PREVch2tag = ch2tag;
+					PREVch2time = ch2time;
+					// <<<
+					
 					// VKORN_TUESDAY >>
 					// OLD: binary
 					// fileOut2.write((const char*)& ch2tag, cSizeOfTAG);
@@ -601,17 +606,22 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		// while ((runFlag) && (i < 5000)) // << DEBUG << //
 		while (runFlag)
 		{
-			// 20.12.2021: VKORN: for checking if monotonic:
-			PREVch1tag = ch1tag;
-			PREVch1time = ch1time;
-			// <<<
+			// YYYYYYYYYYYYYYYYYYYYY
+			//// 20.12.2021: VKORN: for checking if monotonic:
+			//PREVch1tag = ch1tag;
+			//PREVch1time = ch1time;
+			//// <<<
 
 			numArgsRead = sscanf(line.c_str(), "%lld %lf", &ch1tag, &ch1time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
-				if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel) &&
-						(  (ch1tag > PREVch1tag) || ((ch1tag == PREVch1tag)&&(ch1time > PREVch1time))) )	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel) && (  (ch1tag > PREVch1tag) || ((ch1tag == PREVch1tag)&&(ch1time > PREVch1time))) )	// from 0.001 ps to UpperDiscrLevel //
 				{
+					// 20.12.2021: VKORN: for checking if monotonic:
+					PREVch1tag = ch1tag;
+					PREVch1time = ch1time;
+					// <<<
+					
 					// VKORN_TUESDAY >>
 					// OLD:
 					// fileOut1.write((const char*)& ch1tag, cSizeOfTAG);
