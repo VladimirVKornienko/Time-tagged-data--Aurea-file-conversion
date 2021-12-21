@@ -1825,7 +1825,10 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	// std::size_t freadRESULT;
 	// << removed (!)
 	// added:
-	int	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
+	
+	// JJJJJJJJJJJJJJJJ
+	// int	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
+	std::size_t	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
 	// <<<
 
 	bool runFlag = true;
@@ -2194,9 +2197,14 @@ fhOutAuxCh2 << "   " << ch2tag << "   " << ch2time << std::endl;
 
 				// LABEL_MODIF_KVV
 				// ToDo: replace "ch2 left" with fscanfSTATUS == EOF (-1).
-				fread(&ch2tag, helpSizeUINT64, unityForFWRITE, fileInCh2Handle);
+				
+				fscanfSTATUS = fread(&ch2tag, helpSizeUINT64, unityForFWRITE, fileInCh2Handle);
 				// freadRESULT = fread(&ch2time, helpSizeDOUBLE, unityForFWRITE, fileInCh2Handle);
-				fscanfSTATUS = fread(&ch2time, helpSizeDOUBLE, unityForFWRITE, fileInCh2Handle);
+				// if (fscanfSTATUS != EOF)
+				if (fscanfSTATUS == 1)
+				{
+					fscanfSTATUS = fread(&ch2time, helpSizeDOUBLE, unityForFWRITE, fileInCh2Handle);
+				}
 
 				// LABEL EVENING >>>
 
@@ -2212,8 +2220,10 @@ fhOutAuxCh2 << "   " << ch2tag << "   " << ch2time << std::endl;
 						// go to flushing the file!
 					}
 				
-				if ((CH2left > 0) && (fscanfSTATUS != EOF))
-					// << VKORN DESPERATE FLAG
+				// JJJJJJJJJJJJJJJJ
+				// if ((CH2left > 0) && (fscanfSTATUS != EOF))
+				// if (fscanfSTATUS != EOF)
+				if (fscanfSTATUS == 1)
 				{
 					// O.K.
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
@@ -2344,11 +2354,14 @@ fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
 				// fileInCh1Handle.read(reinterpret_cast<char*>(&ch1tag), helpSizeUINT64);
 				// fileInCh1Handle.read(reinterpret_cast<char*>(&ch1time), helpSizeDOUBLE);
 
-				fread(&ch1tag, helpSizeUINT64, unityForFWRITE, fileInCh1Handle);
+				fscanfSTATUS = fread(&ch1tag, helpSizeUINT64, unityForFWRITE, fileInCh1Handle);
 				
 				// LABEL_MODIF_KVV
 				// freadRESULT = fread(&ch1time, helpSizeDOUBLE, unityForFWRITE, fileInCh1Handle);
-				fscanfSTATUS = fread(&ch1time, helpSizeDOUBLE, unityForFWRITE, fileInCh1Handle);
+				if (fscanfSTATUS == 1)
+				{
+					fscanfSTATUS = fread(&ch1time, helpSizeDOUBLE, unityForFWRITE, fileInCh1Handle);
+				}
 				// <<<
 				// ToDo: replace "freadRESULT" with "fscanfSTATUS == 0 or EoF (-1)."
 
@@ -2366,7 +2379,11 @@ fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
 					}
 				
 				// if ((freadRESULT != helpSizeDOUBLE) && (CH1left != 0))
-				if ((CH1left > 0) && (fscanfSTATUS != EOF))
+				
+				// JJJJJJJJJJJJJJJJ
+				// if ((CH1left > 0) && (fscanfSTATUS != EOF))
+				if (fscanfSTATUS == 1)
+				// if (fscanfSTATUS != EOF)
 					// << VKORN DESPERATE FLAG
 				{
 					// O.K.
@@ -2411,7 +2428,7 @@ fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
 		// REWRITE THE HEADER WITH THE GIVEN MEAS_TIME AND N_EVENTS >>>>
 		// >>>>>>>>>>>>>>>>>>>
 
-		Sleep(1000);
+		Sleep(500);
 
 		OutOutOuttemp.open(BUBcurrOutputFileName.c_str());
 		// std::ios_base::out | std::ios_base::in
@@ -2580,7 +2597,10 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 	// ToDo: replace with finding the header end... ;
 
 	bool runFlag = true;
-	int	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
+	
+	// JJJJJJJJJJJJJJJJ
+	// int	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
+	std::size_t	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
 
 	std::stringstream ossTMP;
 	std::string line = "initial_value";
@@ -2609,7 +2629,9 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 
 
 	fscanfSTATUS = fread(&PTUrecord, helpSizeUINT32, unityForFWRITE, fileInHandle);
-	if (fscanfSTATUS == EOF)
+	// JJJJJJJJJJJJJJJJ
+	// if (fscanfSTATUS == EOF)
+	if (fscanfSTATUS != 1)
 		{
 			runFlag = false;
 		}
@@ -2683,7 +2705,10 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 		//if (!fileInHandle.good())
 		// if (fileInHandle.eof())
 		// if (fscanfSTATUS == EOF)
-		if (!fscanfSTATUS)
+
+		// JJJJJJJJJJJJJJJJ
+		// if (!fscanfSTATUS)
+		if (fscanfSTATUS != 1)
 		{
 			runFlag = false;
 		}

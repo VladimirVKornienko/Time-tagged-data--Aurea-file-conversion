@@ -77,4 +77,10 @@ Conversion is now performed at the very last step!
 
 (5.viii) [stage3] ToDo: replace "ch2 left" with fscanfSTATUS == EOF (-1).
 
+(5.ix) last entry is not shown, because of the checks that are made when outputting the files.
+ToDo: replace
+if ((CH1left > 0) && (fscanfSTATUS != EOF))
+with
+if (fscanfSTATUS != EOF)
+
 [(End of ReadMe file.)]
