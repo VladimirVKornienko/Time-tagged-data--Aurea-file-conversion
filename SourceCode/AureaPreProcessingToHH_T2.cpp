@@ -311,15 +311,15 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	//// <<<<
 
 	int64_t ch1tag = 0;
-	double ch1time = 0;
+	double ch1time = 0.0;
 	int64_t ch2tag = 0;
-	double ch2time = 0;
+	double ch2time = 0.0;
 
 	// 20.12.2021: VKORN >>>
 	int64_t PREVch1tag = 0;
-	double PREVch1time = 0;
+	double PREVch1time = 0.0;
 	int64_t PREVch2tag = 0;
-	double PREVch2time = 0;
+	double PREVch2time = 0.0;
 	// <<<<
 
 	// LABEL EVENING TYPES <<<<
@@ -352,8 +352,11 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 	runFlag = true;
 	
+
+
 	int numArgsRead = 0; // should be 4 at first, then switch to 2 at some moment;
-	// << ToDo (QUEST): remove at some point;
+	// it is reading from STRING, and NOT from a file!
+	// that's why <int> here, not <std::size_t> //
 	
 	// LABEL EVENING TYPES >>>
 	//uint64_t ch1LastTag = 0;	// used for determining the correct channel in 'part3'.	
@@ -389,10 +392,17 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	{
 		// 20.12.2021: VKORN >>   Check if the tags are monotonic.
 		// at first step: zeroes.
-		PREVch1tag = ch1tag;
-		PREVch1time = ch1time;
-		PREVch2tag = ch2tag;
-		PREVch2time = ch2time;
+		
+		// UUUUUUUUU
+		// moved to other parts of the instruction!
+
+		// need to reject all below last [typically: many], 
+		//						not only non-monotonic [typically: one point]!
+
+		// PREVch1tag = ch1tag;
+		// PREVch1time = ch1time;
+		// PREVch2tag = ch2tag;
+		// PREVch2time = ch2time;
 		// <<<
 		
 		// unsigned long long int == "%llu", double in e-format == "%le". // (I hope!) //
@@ -414,9 +424,15 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			// process the string
 			
 			// REMOVING BAD RECORDS: //
-			if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel) &&
-				(  (ch1tag > PREVch1tag) || ((ch1tag == PREVch1tag)&&(ch1time > PREVch1time))) )	// from 0.001 ps to UpperDiscrLevel //
+			if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel) && (  (ch1tag > PREVch1tag) || ((ch1tag == PREVch1tag)&&(ch1time > PREVch1time))) )	// from 0.001 ps to UpperDiscrLevel //
 			{
+				// UUUUUUUUU
+				// 20.12.2021: VKORN >>   Check if the tags are monotonic.
+				// update the PREV value iff it is smaller than current entry:
+				PREVch1tag = ch1tag;
+				PREVch1time = ch1time;
+				// <<<
+				
 				// VKORN_TUESDAY >>
 				// OLD:
 				// fileOut1.write((const char*)& ch1tag, cSizeOfTAG);
@@ -446,9 +462,15 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 				ch1Nskipped = ch1Nskipped + ((uint64_t)1);
 			}
 
-			if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel) &&
-				(  (ch2tag > PREVch2tag) || ((ch2tag == PREVch2tag)&&(ch2time > PREVch2time))) )
+			if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel) && (  (ch2tag > PREVch2tag) || ((ch2tag == PREVch2tag)&&(ch2time > PREVch2time))) )
 			{
+				// UUUUUUUUU
+				// 20.12.2021: VKORN >>   Check if the tags are monotonic.
+				// update the PREV value iff it is smaller than current entry:
+				PREVch2tag = ch2tag;
+				PREVch2time = ch2time;
+				// <<<
+				
 				// VKORN_TUESDAY >>
 				// OLD:
 				// fileOut2.write((const char*)& ch2tag, cSizeOfTAG);

@@ -28,6 +28,7 @@ Current tasks:
 
 (-2) In [stage1] (and partially in [stage4], change file read instructions 
 				according to [stage3], which is working fine.
+			(???)
 
 (-1) Create reverse wrapper (ptu -> Aurea formats)
 
