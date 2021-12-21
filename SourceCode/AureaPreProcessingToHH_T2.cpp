@@ -48,8 +48,17 @@
 #ifndef stage4_Write_Overflow_Flags_ToFile
 #define stage4_Write_Overflow_Flags_ToFile
 // (un)comment for writing (skipping) overflow markers when de-coding back from PTU format to Aurea format.
+// will be used in [stage3] also, if
+//				<stage3_DEBUG_re_create_files_with_text_tag_time_values> is defined.
 #endif
 
+#ifndef stage3_DEBUG_re_create_files_with_text_tag_time_values
+#define stage3_DEBUG_re_create_files_with_text_tag_time_values
+// uncomment to create 2 add. files with tags and times, as seen in stage 3.
+// (Not from PTU file, as in Stage 4).
+
+// NB! works only for the last file in a batch (matter of simplicity, and enough for debugging).
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1838,6 +1847,37 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	uint32_t	myCh2Mask = ((uint32_t)1) << 28; // number of channel (from 0) shifted by N_bits_TimeTag to the left.
 	uint32_t	myOVFLMask = ((uint32_t)15) << 28; // MSB;	// = 0b1111 + 28 more bit values.
 
+// LLLLLLLLLLL
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+	// create 2 aux. files, open, prepare for output.
+	BUBcurrOutputFileName = fileOutName;
+	BUBcurrOutputFileName.append("_aux_stage3_ch1.dat");
+	std::ofstream fhOutAuxCh1(BUBcurrOutputFileName.c_str());
+	if (!fhOutAuxCh1.is_open())
+	{
+		fileInHEADERHandle.close();
+		fclose(fileInCh1Handle);
+		fclose(fileInCh2Handle);
+		cout << std::endl << "Error opening aux. output file (ch.1)." << std::endl;
+		return 1;
+	}
+	
+	BUBcurrOutputFileName = fileOutName;
+	BUBcurrOutputFileName.append("_aux_stage3_ch2.dat");
+	std::ofstream fhOutAuxCh2(BUBcurrOutputFileName.c_str());
+	if (!fhOutAuxCh2.is_open())
+	{
+		fileInHEADERHandle.close();
+		fclose(fileInCh1Handle);
+		fclose(fileInCh2Handle);
+		fclose(fhOutAuxCh1);
+		cout << std::endl << "Error opening aux. output file (ch.2)." << std::endl;
+		return 1;
+	}
+
+#endif
+
+
 	// DEBUG PRINT: >>
 	cout << "Defined masks (Ch1 // Ch2 // OverflowBit):" << std::endl;
 
@@ -2084,6 +2124,12 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 				while (auxTimePS > (double)myOverflowVal)
 				{
 					
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+	#ifdef stage4_Write_Overflow_Flags_ToFile
+	fhOutAuxCh2 << "OVFL_MARKER" << std::endl;
+	#endif
+#endif
+
 					// Write an overflow event:
 					convertedCH2timePS = ((uint32_t)0) | myOVFLMask;
 					fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
@@ -2141,7 +2187,11 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 #endif
 
 				fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
-			
+
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+fhOutAuxCh2 << "   " << ch2tag << "   " << ch2time << std::endl;
+#endif
+
 				// LABEL_MODIF_KVV
 				// ToDo: replace "ch2 left" with fscanfSTATUS == EOF (-1).
 				fread(&ch2tag, helpSizeUINT64, unityForFWRITE, fileInCh2Handle);
@@ -2197,6 +2247,12 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 				while (auxTimePS > (double)myOverflowVal)
 				{
 					
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+	#ifdef stage4_Write_Overflow_Flags_ToFile
+	fhOutAuxCh1 << "OVFL_MARKER" << std::endl;
+	#endif
+#endif
+
 					// Write an overflow event:
 					convertedCH1timePS = ((uint32_t)0) | myOVFLMask;
 					fwrite(&convertedCH1timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
@@ -2267,6 +2323,11 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 			// fileOutHandle.write(reinterpret_cast<char*>(&convertedCH1timePS), helpSizeUINT32);
 			// << VKORN DESPERATE FLAG
 				fwrite(&convertedCH1timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
+
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+fhOutAuxCh1 << "   " << ch2tag << "   " << ch2time << std::endl;
+#endif
+
 				// << VKORN_TUESDAY
 
 				// Get new value from file for CH1:  (mark file end if needed:)
@@ -2423,20 +2484,28 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 		Sleep(500);
 		OutOutOuttemp.close();
 
-} // MAIN NEW CYCLE
+	} // MAIN NEW CYCLE    (For <file> in <files> ...)
+	
 	// HERE GOES THE END OF THE FOR LOOP //
-	// RRRRRRRRRRRRRRRRRR
-
-
+	
 	// <<<<<<<<<<<<<<<<<<<<<<<<<
 	// <<<< REWRITE THE HEADER
 
-	// RRRRRRRRRRRRRRRRR
-
+	
 	cout << "closing the files" << std::endl;
 
 	fclose(fileInCh1Handle);
 	fclose(fileInCh2Handle);
+
+// LLLLLLLLLLL
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+	// closing files with directly back-converted time and tag values.
+	fhOutAuxCh1.flush();
+	fhOutAuxCh2.flush();
+	
+	fhOutAuxCh1.close();
+	fhOutAuxCh2.close();
+#endif
 
 	return 0;
 }
