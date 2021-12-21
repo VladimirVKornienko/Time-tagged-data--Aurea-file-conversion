@@ -31,5 +31,8 @@
 *.out
 *.app
 
+# except for this one:
+!SourceCode/Source.exe
+
 # VS code files
 SourceCode/.vscode
