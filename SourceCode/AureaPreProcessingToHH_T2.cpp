@@ -29,8 +29,7 @@
 // [<MeasurementTime>] == milliseconds ??!? //
 
 #ifndef AureaProcessorPart2OverflowDebuggingMessages
-// #define AureaProcessorPart2OverflowDebuggingMessages
-
+//#define AureaProcessorPart2OverflowDebuggingMessages
 // << uncomment to use debugging on first 10 records. //
 #endif
 
@@ -46,6 +45,24 @@
 // << uncomment for DEBUG MODE (ONLY). //
 #endif
 
+#ifndef stage4_Write_Overflow_Flags_ToFile
+#define stage4_Write_Overflow_Flags_ToFile
+// (un)comment for writing (skipping) overflow markers when de-coding back from PTU format to Aurea format.
+// will be used in [stage3] also, if
+//				<stage3_DEBUG_re_create_files_with_text_tag_time_values> is defined.
+#endif
+
+#ifndef stage3_DEBUG_re_create_files_with_text_tag_time_values
+#define stage3_DEBUG_re_create_files_with_text_tag_time_values
+
+// uncomment to create 2 add. files with tags and times, as seen in stage 3.
+// (Not from PTU file, as in Stage 4).
+
+// this checks for the consistency of aux. files, generated suring the stage 1.
+// it has been proof-checked, it is working finely.
+
+// NB! works only for the last file in a batch (matter of simplicity, and enough for debugging).
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -128,7 +145,11 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
 	// Getting total experiment time: >>
-	uint64_t	maxTAG = 0;
+	
+	// LABEL EVENING TYPES >>>
+	//uint64_t	maxTAG = 0;
+	int64_t	maxTAG = 0;
+
 	// Will be +1 after last entry. (An approximation, but quite accurate one!).
 	// <<<
 
@@ -275,10 +296,34 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		
 	// part 2:  4 numbers total, 2 channels data is present
 	
-	uint64_t ch1tag = 0;
-	double ch1time = 0;
-	uint64_t ch2tag = 0;
-	double ch2time = 0;
+	// LABEL EVENING TYPES >>>
+	//
+	//uint64_t ch1tag = 0;
+	//double ch1time = 0;
+	//uint64_t ch2tag = 0;
+	//double ch2time = 0;
+
+	//// 20.12.2021: VKORN >>>
+	//uint64_t PREVch1tag = 0;
+	//double PREVch1time = 0;
+	//uint64_t PREVch2tag = 0;
+	//double PREVch2time = 0;
+	//// <<<<
+
+	int64_t ch1tag = 0;
+	double ch1time = 0.0;
+	int64_t ch2tag = 0;
+	double ch2time = 0.0;
+
+	// 20.12.2021: VKORN >>>
+	int64_t PREVch1tag = 0;
+	double PREVch1time = 0.0;
+	int64_t PREVch2tag = 0;
+	double PREVch2time = 0.0;
+	// <<<<
+
+	// LABEL EVENING TYPES <<<<
+	// <<<<<<<<<<<<<<< 
 
 	// first record - parse manually, from an std::string
 	// using StringStream
@@ -307,18 +352,27 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 
 	runFlag = true;
 	
+
+
 	int numArgsRead = 0; // should be 4 at first, then switch to 2 at some moment;
-	// << ToDo (QUEST): remove at some point;
+	// it is reading from STRING, and NOT from a file!
+	// that's why <int> here, not <std::size_t> //
 	
-	uint64_t ch1LastTag = 0;	// used for determining the correct channel in 'part3'.	
-	uint64_t ch2LastTag = 0;
+	// LABEL EVENING TYPES >>>
+	//uint64_t ch1LastTag = 0;	// used for determining the correct channel in 'part3'.	
+	//uint64_t ch2LastTag = 0;
+	int64_t ch1LastTag = 0;	// used for determining the correct channel in 'part3'.	
+	int64_t ch2LastTag = 0;
+
 
 	// VKORN_TUESDAY >>
 	//unsigned int const cSizeOfTAG  = sizeof(uint64_t);
 	//unsigned int const cSizeOfTIME = sizeof(double);
 
 	std::size_t	cSizeOfTIME = sizeof(double);
-	std::size_t	cSizeOfTAG = sizeof(uint64_t);
+	// LABEL EVENING TYPES >>>
+	// std::size_t	cSizeOfTAG = sizeof(uint64_t);
+	std::size_t	cSizeOfTAG = sizeof(int64_t);
 	// <<< VKORN_TUESDAY
 
 	// DEBUG >>>
@@ -336,10 +390,27 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	while (runFlag)
 		// new line is read from file at the very end of this 'while' loop.;
 	{
+		// 20.12.2021: VKORN >>   Check if the tags are monotonic.
+		// at first step: zeroes.
+		
+		// UUUUUUUUU
+		// moved to other parts of the instruction!
+
+		// need to reject all below last [typically: many], 
+		//						not only non-monotonic [typically: one point]!
+
+		// PREVch1tag = ch1tag;
+		// PREVch1time = ch1time;
+		// PREVch2tag = ch2tag;
+		// PREVch2time = ch2time;
+		// <<<
+		
 		// unsigned long long int == "%llu", double in e-format == "%le". // (I hope!) //
 		// numArgsRead = sscanf(line, "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);
-		numArgsRead = sscanf(line.c_str(), "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);		
 		
+		// LABEL EVENING TYPES >>>
+		// numArgsRead = sscanf(line.c_str(), "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);		
+		numArgsRead = sscanf(line.c_str(), "%lld %lf %lld %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);
 		
 		
 		// debug message:
@@ -353,8 +424,15 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			// process the string
 			
 			// REMOVING BAD RECORDS: //
-			if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+			if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel) && (  (ch1tag > PREVch1tag) || ((ch1tag == PREVch1tag)&&(ch1time > PREVch1time))) )	// from 0.001 ps to UpperDiscrLevel //
 			{
+				// UUUUUUUUU
+				// 20.12.2021: VKORN >>   Check if the tags are monotonic.
+				// update the PREV value iff it is smaller than current entry:
+				PREVch1tag = ch1tag;
+				PREVch1time = ch1time;
+				// <<<
+				
 				// VKORN_TUESDAY >>
 				// OLD:
 				// fileOut1.write((const char*)& ch1tag, cSizeOfTAG);
@@ -384,8 +462,15 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 				ch1Nskipped = ch1Nskipped + ((uint64_t)1);
 			}
 
-			if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel))
+			if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel) && (  (ch2tag > PREVch2tag) || ((ch2tag == PREVch2tag)&&(ch2time > PREVch2time))) )
 			{
+				// UUUUUUUUU
+				// 20.12.2021: VKORN >>   Check if the tags are monotonic.
+				// update the PREV value iff it is smaller than current entry:
+				PREVch2tag = ch2tag;
+				PREVch2time = ch2time;
+				// <<<
+				
 				// VKORN_TUESDAY >>
 				// OLD:
 				// fileOut2.write((const char*)& ch2tag, cSizeOfTAG);
@@ -421,15 +506,18 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			// << read a new line //
 		}
 		else { // stop processing; determine the channel (1 or 2); then continue to part 3;
-			if (numArgsRead == 2)
-			{
+			
+			// 20.12.2021: just proceed to processing 2 arguments, if needed.
+			
+			// if (numArgsRead == 2)
+			// {
 				runFlag = false;
-			}
-			else
-			{
-				cout << "unknown record encountered (stage 2), aborting..." << std::endl;
-				runFlag = false;
-			}
+			// }
+			// else
+			// {
+			// 	cout << "unknown record encountered (stage 2), aborting..." << std::endl;
+			// 	runFlag = false;
+			// }
 		}
 	
 	// i++; // overflow DEBUG control //
@@ -452,11 +540,17 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		// while ((runFlag) && (i < 5000)) // << DEBUG << //
 		while (runFlag)
 		{
-			numArgsRead = sscanf(line.c_str(), "%llu %lf", &ch2tag, &ch2time);
+			// 20.12.2021: VKORN: for checking if monotonic:
+			PREVch2tag = ch2tag;
+			PREVch2time = ch2time;
+			// <<<
+
+			numArgsRead = sscanf(line.c_str(), "%lld %lf", &ch2tag, &ch2time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
 				
-				if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch2time > myLowerDiscrLevel) && (ch2time < myUpperDiscrLevel) &&
+					(  (ch2tag > PREVch2tag) || ((ch2tag == PREVch2tag)&&(ch2time > PREVch2time))) )	// from 0.001 ps to UpperDiscrLevel //
 				{
 					// VKORN_TUESDAY >>
 					// OLD: binary
@@ -507,10 +601,16 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		// while ((runFlag) && (i < 5000)) // << DEBUG << //
 		while (runFlag)
 		{
-			numArgsRead = sscanf(line.c_str(), "%llu %lf", &ch1tag, &ch1time);
+			// 20.12.2021: VKORN: for checking if monotonic:
+			PREVch1tag = ch1tag;
+			PREVch1time = ch1time;
+			// <<<
+
+			numArgsRead = sscanf(line.c_str(), "%lld %lf", &ch1tag, &ch1time);
 			if (numArgsRead == 2)
 			{	// normal processing: output to both channels:;
-				if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel))	// from 0.001 ps to UpperDiscrLevel //
+				if ((ch1time > myLowerDiscrLevel) && (ch1time < myUpperDiscrLevel) &&
+						(  (ch1tag > PREVch1tag) || ((ch1tag == PREVch1tag)&&(ch1time > PREVch1time))) )	// from 0.001 ps to UpperDiscrLevel //
 				{
 					// VKORN_TUESDAY >>
 					// OLD:
@@ -561,7 +661,8 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	
 	// 17.12.2021: to be removed at some point... >>>
 	maxTAG = std::max(ch1LastTag, ch2LastTag);
-	maxTAG++;
+	// maxTAG++;
+	maxTAG = maxTAG + ((int64_t)1);
 	// cout << "Of " << ch1LastTag << " and " << ch2LastTag << " , max (+1) chosen: " << maxTAG << std::endl;
 
 	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
@@ -756,17 +857,10 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	
 	// TagRECTYPE includes first 16 bytes of the header.
 	// When all the fields from the header are parsed, can be changed to standard PQ notation.
-	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ����      ";	// HydraHarp, T2
 	
-	// Very bad solution: cast all the others to tyInt8 = 0x10000008, //
 	
 	std::string TagPREHEADER16bytes = "***AUREA FILE***";
-	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ����      ";	// HydraHarp, T2
-	//std::string TagNUMREC = "TTResult_NumberOfRecords        ����  "; // + append 8 bytes (uint64) <NcntsTOT>
-	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ����   �-���q="; // 1 ps == standard
-	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ����  "; // + append 8 bytes (uint64) <inMeasTime>
-	//std::string TagHEADEREND = "Header_End                      ���� ��        "; // no change
-
+	
 	// Now: need to append Idx (int32_t), Type (uint32_t), and Value (8 bytes).
 	std::string TagRECTYPE = "TTResultFormat_TTTRRecType";	// HydraHarp, T2
 	std::string TagNUMREC = "TTResult_NumberOfRecords"; // + append (uint64) <NcntsTOT>
@@ -872,7 +966,7 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	// VKORN DESPERATE FLAG >>
 	fileOutHandle.close();
 
-	Sleep(1000);
+	Sleep(100);
 	
 
 	FILE* NEWOutHandle = fopen(fileOutName, "ab");
@@ -900,10 +994,6 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	}
 
 	std::size_t freadRESULT;
-
-	// << VKORN DESPERATE FLAG
-
-	// << VKORN_TUESDAY
 
 	// <<< (Pre-formatting header).
 
@@ -1080,6 +1170,9 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 				lastOVFLtime = (1.0e-3) * round(lastOVFLtime*(1.0e3) + (((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag)));
 				// 1e-3: ps -> ns;
 				// NOW: AVERAGED TO UNITS OF PICOSECONDS //
+
+// TODO: 
+// here, a WHILE loop should be...
 
 				if (lastOVFLtime > (inAureaPSin1Tag * (1.0e-3))) // can occur only once...
 				{
@@ -1494,9 +1587,10 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 // it should be constant, from the code...
 
 
+// Stage 2 is obsolete and will be removed... //
 
 
-// Copied from Stage2 on Nov.23, modified a bit.
+// Copied from Stage2 on Nov.23, modified SIGNIFICANTLY (!).
 int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOutName, const char* fileInNameCh1, const char* fileInNameCh2,
 	const char* fileInNameHEADER, double inAureaPSin1Tag,
 	double inMeasTime, uint64_t Ncnts1, uint64_t Ncnts2,
@@ -1585,18 +1679,14 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	//			ToDo:	Process all the header file fields appropriately
 	// Current version: just five necessary fields, manually:
 
-	// TagRECTYPE includes first 16 bytes of the header.
+	
 	// When all the fields from the header are parsed, can be changed to standard PQ notation.
-	// std::string TagRECTYPE = "***AUREA FILE***TTResultFormat_TTTRRecType      ����      ";	// HydraHarp, T2
 
 	// Very bad solution: cast all the others to tyInt8 = 0x10000008, //
 
 	std::string TagPREHEADER16bytes = "***AUREA FILE***";
-	//std::string TagRECTYPE = "TTResultFormat_TTTRRecType      ����      ";	// HydraHarp, T2
-	//std::string TagNUMREC = "TTResult_NumberOfRecords        ����  "; // + append 8 bytes (uint64) <NcntsTOT>
-	//std::string TagGLOBRES = "MeasDesc_GlobalResolution       ����   �-���q="; // 1 ps == standard
-	//std::string TagACQTIME = "MeasDesc_AcquisitionTime        ����  "; // + append 8 bytes (uint64) <inMeasTime>
-	//std::string TagHEADEREND = "Header_End                      ���� ��        "; // no change
+	
+	//  Firt 16 bytes of the PTU file are a header.
 
 	// Now: need to append Idx (int32_t), Type (uint32_t), and Value (8 bytes).
 	std::string TagRECTYPE = "TTResultFormat_TTTRRecType";	// HydraHarp, T2
@@ -1608,6 +1698,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	//std::size_t stringPrinterSize = 32;
 	// tag heading should be a null-terminated string, padded with zeroes.
 
+	// +1 :: obsolete; can be removed, probably...
 	TagRECTYPE.append(((std::size_t)AUREABytesInATagName) - TagRECTYPE.length() + 1, '\0');
 	TagNUMREC.append(((std::size_t)AUREABytesInATagName) - TagNUMREC.length() + 1, '\0');
 	TagGLOBRES.append(((std::size_t)AUREABytesInATagName) - TagGLOBRES.length() + 1, '\0');
@@ -1712,7 +1803,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	// WWWWWWWWWWWWWWWWWWWWWW
 
-	Sleep(1000);
+	Sleep(100);
 
 	// fs::copy_file("sandbox/file1.txt", "sandbox/file2.txt");
 	// DOES NOT WORK. INSTEAD:
@@ -1754,11 +1845,23 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 		return 1;
 	}
 
-	std::size_t freadRESULT;
+	//OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+	
+	// LABEL_MODIF_KVV
+	// std::size_t freadRESULT;
+	// << removed (!)
+	// added:
+	
+	// JJJJJJJJJJJJJJJJ
+	// int	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
+	std::size_t	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
+	// <<<
 
 	bool runFlag = true;
-	uint32_t	CurrTime = 0;	// incremental time for a loop;
-
+	
+	// LABEL_MODIF_KVV
+	// uint32_t	CurrTime = 0;	// incremental time for a loop;
+	// TODEL
 	
 	// Combine channels, convert from float(ns) to unsigned(25bit)(ps), add overflow tags.
 
@@ -1773,6 +1876,37 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	uint32_t	myCh2Mask = ((uint32_t)1) << 28; // number of channel (from 0) shifted by N_bits_TimeTag to the left.
 	uint32_t	myOVFLMask = ((uint32_t)15) << 28; // MSB;	// = 0b1111 + 28 more bit values.
 
+// LLLLLLLLLLL
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+	// create 2 aux. files, open, prepare for output.
+	BUBcurrOutputFileName = fileOutName;
+	BUBcurrOutputFileName.append("_aux_stage3_ch1.dat");
+	std::ofstream fhOutAuxCh1(BUBcurrOutputFileName.c_str());
+	if (!fhOutAuxCh1.is_open())
+	{
+		fileInHEADERHandle.close();
+		fclose(fileInCh1Handle);
+		fclose(fileInCh2Handle);
+		cout << std::endl << "Error opening aux. output file (ch.1)." << std::endl;
+		return 1;
+	}
+	
+	BUBcurrOutputFileName = fileOutName;
+	BUBcurrOutputFileName.append("_aux_stage3_ch2.dat");
+	std::ofstream fhOutAuxCh2(BUBcurrOutputFileName.c_str());
+	if (!fhOutAuxCh2.is_open())
+	{
+		fileInHEADERHandle.close();
+		fclose(fileInCh1Handle);
+		fclose(fileInCh2Handle);
+		fhOutAuxCh1.close();
+		cout << std::endl << "Error opening aux. output file (ch.2)." << std::endl;
+		return 1;
+	}
+
+#endif
+
+
 	// DEBUG PRINT: >>
 	cout << "Defined masks (Ch1 // Ch2 // OverflowBit):" << std::endl;
 
@@ -1785,20 +1919,36 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	std::size_t	helpSizeDOUBLE = sizeof(double);
 	std::size_t	helpSizeUINT64 = sizeof(uint64_t);
 
-	uint64_t	hlpOVFLtrunc = ((uint64_t)trunc(((double)myOverflowVal) / inAureaPSin1Tag));
+	// LABEL EVENING TYPES >>>
+	//uint64_t	hlpOVFLtrunc = ((uint64_t)trunc(((double)myOverflowVal) / inAureaPSin1Tag));
+	int64_t	hlpOVFLtrunc = ((int64_t)trunc(((double)myOverflowVal) / inAureaPSin1Tag));
+
 	// aux for calculations;
 	// convert current excess time into {Tag, Time} pair.
 
 	// <<<<<<  "CONSTANTS", not to iterate in a cycle //
 
 
-	uint64_t	ch1tag;		// tags, see <inAureaPSin1Tag>
+	// LABEL EVENING TYPES >>>
+	//uint64_t	ch1tag;		// tags, see <inAureaPSin1Tag>
+	int64_t		ch1tag;		// tags, see <inAureaPSin1Tag>
 	double		ch1time;	// ns
-	uint64_t	ch2tag;		// tags, see <inAureaPSin1Tag>
+	//uint64_t	ch2tag;		// tags, see <inAureaPSin1Tag>
+	int64_t		ch2tag;		// tags, see <inAureaPSin1Tag>
 	double		ch2time;	// ns
 
+	
 	uint32_t	convertedCH1timePS; // after subtracting <lastOVFL> and converting to ps //
 	uint32_t	convertedCH2timePS;
+	// <<< // LABEL EVENING TYPES 
+
+
+	// 20.12.2021: VKORN >>>
+	double		auxTimePS;			//	ps
+									// then convertedCH_x_ := (uint32_t)round(auxTime). //
+	// <<<<
+
+	//OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
 	FILE* NEWOutHandle;		// is redefined in each cycle;
 	// OUTPUT
@@ -1811,7 +1961,10 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	// Used to cope with overflow events; stores the last {time,tag} for an overflow event;
 	// (add <myOverflowVal> (ps) and convert it to time and tag)
-	uint64_t	lastOVFLtag = 0;		// tags
+	
+	// LABEL EVENING TYPES >>>
+	//uint64_t	lastOVFLtag = 0;		// tags
+	int64_t		lastOVFLtag = 0;		// tags
 	double		lastOVFLtime = 0.0;		// ns
 
 	uint64_t CH1left = Ncnts1;
@@ -1824,7 +1977,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	convertedCH1timePS = 0; // after subtracting <lastOVFL> and converting to ps //
 	convertedCH2timePS = 0;
-
+	
 	// INITIALIZE TAGS AND TIMES: (NOT IN A CYCLE!)
 	fread(&ch1tag, helpSizeUINT64, unityForFWRITE, fileInCh1Handle);
 	fread(&ch1time, helpSizeDOUBLE, unityForFWRITE, fileInCh1Handle);
@@ -1838,8 +1991,10 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	
 	cout << std::endl << std::endl << "entering the output loop:" << std::endl;
 	
-	uint64_t BUBskipTAG;
-	// When reached, flush the current file and then move forward.
+	// LABEL EVENING TYPES >>>
+	//uint64_t BUBskipTAG;
+	int64_t BUBskipTAG;
+	// Max tag number. When reached, flush the current file and then move forward.
 
 	//RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
 	// NEW: INIT CYCLE::
@@ -1860,7 +2015,9 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 			return 1;
 		}
 
-		BUBskipTAG = (std::min(ch1tag, ch2tag)) + (uint64_t)round(TimeToSplitSEC / (inAureaPSin1Tag * 1.0e-12));
+		// LABEL EVENING TYPES >>>
+		// BUBskipTAG = (std::min(ch1tag, ch2tag)) + (uint64_t)round(TimeToSplitSEC / (inAureaPSin1Tag * 1.0e-12));
+		BUBskipTAG = (std::min(ch1tag, ch2tag)) + (int64_t)round(TimeToSplitSEC / (inAureaPSin1Tag * 1.0e-12));
 		// do check it every cycle...
 
 		bCh1empty = false;
@@ -1872,7 +2029,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 		// #ifdef AureaProcessorPart2OverflowDebuggingMessages
 		cout << "First record (i=" << BUBcurrFileN << "): " << std::endl;
-		cout << "BUBskipTAG = " << BUBskipTAG << std::endl;
+		cout << "BUBskipTAG (max tag to process in this file) = " << BUBskipTAG << std::endl;
 		cout << "ch1tag: " << ch1tag << " \tch1time: " << ch1time << std::endl;
 		cout << "ch2tag: " << ch2tag << " \tch2time: " << ch2time << std::endl;
 		// #endif
@@ -1881,6 +2038,8 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 		long int i = 0;
 #endif
 
+//OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+		
 		
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
 		while ((runFlag) && (i < 10))
@@ -1895,123 +2054,203 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
 				cout << "ch2 write" << std::endl;
 #endif
-				// convertedCH2timePS = (uint32_t)lround(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
-				convertedCH2timePS = (uint32_t)round(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
+				//OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
+				// 20.12.2021: VKORN: >>>
+				// convertedCH2timePS = (uint32_t)lround(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
+				// convertedCH2timePS = (uint32_t)round(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
 				// 1e3: ns -> ps //
 				// AVERAGE TO UNITS OF PICOSECONDS //
+				
+				
+				// auxTimePS = ((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime);
+				// :: moved below, to the "while [overflow]" loop.
+				
+				// <<<
 
 				// Overflow check:
 				// OLD: // if (convertedCH2timePS > myOverflowVal)
 				// NOW SHOULD BE CAPABLE OF ADDING MULTIPLE OVERFLOW EVENTS //
 				// WITHOUT RUINING UP THE TIME VALUE //
-				while (convertedCH2timePS > myOverflowVal)
-				{
-					// increase OVFL marker, recalculate value
-					// hlpOVFLtrunc = ((uint64_t)trunc(  ((double)myOverflowVal) / inAureaPSin1Tag  ));
-					// << defined before <while> loop.
+				
 
-#ifdef AureaProcessorPart2OverflowDebuggingMessages
-					cout << "old EVENT time: " << convertedCH2timePS << std::endl;
-					cout << "old OVFL tag = " << lastOVFLtag << " \t" << "old OVFL time = " << lastOVFLtime << std::endl;
-#endif
-					lastOVFLtag = lastOVFLtag + hlpOVFLtrunc;
-					// OLD: // lastOVFLtime = lastOVFLtime + (1e-3) * (((double)myOverflowVal) - (hlpOVFLtrunc * inAureaPSin1Tag));
+				// while (convertedCH2timePS > (double)myOverflowVal)
 
-					// lastOVFLtime = lastOVFLtime + (1e-3)*(((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag));
+
+				// LABEL_MODIF_KVV
+				// 20.12.2021: >>> 
+				
+				//while (auxTimePS > (double)myOverflowVal)
+				//{
+				//	// increase OVFL marker, recalculate value
+				//	// hlpOVFLtrunc = ((uint64_t)trunc(  ((double)myOverflowVal) / inAureaPSin1Tag  ));
+				//	// << defined before <while> loop.
+
+//#ifdef AureaProcessorPart2OverflowDebuggingMessages
+//					cout << "old EVENT time: " << convertedCH2timePS << std::endl;
+//					cout << "old OVFL tag = " << lastOVFLtag << " \t" << "old OVFL time = " << lastOVFLtime << std::endl;
+//#endif
+					
+				//	lastOVFLtag = lastOVFLtag + hlpOVFLtrunc;
+				//	// // OLD: // lastOVFLtime = lastOVFLtime + (1e-3) * (((double)myOverflowVal) - (hlpOVFLtrunc * inAureaPSin1Tag));
+				//	lastOVFLtime = lastOVFLtime + (1e-3)*(((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag));
+					
+					
 					// Nov.20: round to <ps> level:
-					lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) + (((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag)));
+					// lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) + (((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag)));
 					// 1e-3: ps -> ns;
-					// NOW: AVERAGED TO UNITS OF PICOSECONDS //
+					// upd: rolled back; NOW: AVERAGED TO UNITS OF PICOSECONDS //
 
-					if (lastOVFLtime > (inAureaPSin1Tag * (1.0e-3))) // can occur only once...
-					{
-						lastOVFLtag = lastOVFLtag + (uint32_t)1;
-						// lastOVFLtime = lastOVFLtime - (inAureaPSin1Tag * (1e-3));
-						lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) - inAureaPSin1Tag);
-						// NOW: AVERAGED TO UNITS OF PICOSECONDS //
-					}
+				//	if (lastOVFLtime > (inAureaPSin1Tag * (1.0e-3))) // can occur only once...
+				//	{
+				//		lastOVFLtag = lastOVFLtag + (uint64_t)1;
+				//		
+				//		// 20.12.2021: VKORN: >>>
+				//		lastOVFLtime = lastOVFLtime - (inAureaPSin1Tag * (1e-3));
+				//		// lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) - inAureaPSin1Tag);
+				//		// upd: revinded. NOW: AVERAGED TO UNITS OF PICOSECONDS //
+				//		// <<<
+				//	}
 
-#ifdef AureaProcessorPart2OverflowDebuggingMessages
-					cout << "new OVFL tag = " << lastOVFLtag << " \t" << "new OVFL time = " << lastOVFLtime << std::endl;
-#endif
+//#ifdef AureaProcessorPart2OverflowDebuggingMessages
+//					cout << "new OVFL tag = " << lastOVFLtag << " \t" << "new OVFL time = " << lastOVFLtime << std::endl;
+//#endif
 					// Write an overflow event:
-					convertedCH2timePS = ((uint32_t)0) | myOVFLMask;
+				//	convertedCH2timePS = ((uint32_t)0) | myOVFLMask;
 
-					// VKORN_TUESDAY >>
+				//	// VKORN_TUESDAY >>
 					// OLD:
 					// fileOutHandle.write((const char*)& convertedCH2timePS, helpSizeUINT32); // OVFL marker written;
 
-					// NEW: text only ((
+				//	// NEW: text only ((
 					// fileOutHandle << convertedCH2timePS;
 
 					// NEW: binary:
 					// VKORN DESPERATE FLAG >>
 					// fileOutHandle.write(reinterpret_cast<char*>(&convertedCH2timePS), helpSizeUINT32); // OVFL marker written;
-					fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
+				//	fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
 					// << VKORN DESPERATE FLAG
 					// << VKORN_TUESDAY
 
+				//	// increase the counter of overflow events;
+				//	nOVFLmarkersREAL = nOVFLmarkersREAL + ((uint64_t)1);
+				//	BUBtotalItems = BUBtotalItems + ((uint64_t)1);
+				//	// decrease time by 1 "overflow value":
+				//	// convertedCH2timePS = (uint32_t)lround(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
+				//	convertedCH2timePS = (uint32_t)round(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
+
+					// 1e-3: ps -> ns;
+//#ifdef AureaProcessorPart2OverflowDebuggingMessages
+//					cout << "new EVENT time: " << convertedCH2timePS << std::endl;
+//#endif
+
+				// }
+
+				// <<< before 20.12.2021.
+				// After: >>>
+				auxTimePS = ((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime);
+
+				while (auxTimePS > (double)myOverflowVal)
+				{
+					
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+	#ifdef stage4_Write_Overflow_Flags_ToFile
+	fhOutAuxCh2 << "OVFL_MARKER" << std::endl;
+	#endif
+#endif
+
+					// Write an overflow event:
+					convertedCH2timePS = ((uint32_t)0) | myOVFLMask;
+					fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
+					
 					// increase the counter of overflow events;
 					nOVFLmarkersREAL = nOVFLmarkersREAL + ((uint64_t)1);
 					BUBtotalItems = BUBtotalItems + ((uint64_t)1);
+					
 					// decrease time by 1 "overflow value":
 					// convertedCH2timePS = (uint32_t)lround(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
-					convertedCH2timePS = (uint32_t)round(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
-
+					// convertedCH2timePS = (uint32_t)round(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
 					// 1e-3: ps -> ns;
+					
+					// lastOVFLtag = lastOVFLtag + (uint64_t)1;
+					// auxTimePS = auxTimePS - inAureaPSin1Tag;
+					
+					lastOVFLtag = lastOVFLtag + hlpOVFLtrunc;
+					lastOVFLtime = lastOVFLtime + (1e-3)*(((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag));
+						// Nov.20: round to <ps> level:
+						// lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) + (((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag)));
+						// 1e-3: ps -> ns;
+						// upd: rolled back; NOW: AVERAGED TO UNITS OF PICOSECONDS //
+
+					
+					while (lastOVFLtime > (inAureaPSin1Tag * (1.0e-3))) // can occur only once...
+					// I am putting a 'while' loop, just in case...
+					{
+						// LABEL EVENING TYPES >>>
+						// lastOVFLtag = lastOVFLtag + (uint64_t)1;
+						lastOVFLtag = lastOVFLtag + (int64_t)1;
+						// 20.12.2021: VKORN: >>>
+						lastOVFLtime = lastOVFLtime - (inAureaPSin1Tag * (1e-3));
+						// lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) - inAureaPSin1Tag);
+						// upd: rolled back. NOW: AVERAGED TO UNITS OF PICOSECONDS //
+						// <<<
+					}
+					
+					
+					// recalculate time (starting from the last overflow moment):
+					auxTimePS = ((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime);
+
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
 					cout << "new EVENT time: " << convertedCH2timePS << std::endl;
 #endif
 
-				}
-
+				}	// while overshooting : write overflow events..
+				
+				
 				// Apply the channel mask:
 #ifdef AureaReverseChannelAndTimeData
 				convertedCH2timePS = (convertedCH2timePS << 4) | myCh2Mask; // first Time, then Channel
 #else
-				convertedCH2timePS = convertedCH2timePS | myCh2Mask; // first Channel (MSB), then Time
+				// convertedCH2timePS = convertedCH2timePS | myCh2Mask; // first Channel (MSB), then Time
+				convertedCH2timePS = ((uint32_t)(round(auxTimePS))) | myCh2Mask; // first Channel (MSB), then Time
 #endif
 
-			// fileOutHandle << convertedCH2timePS;
-			// VKORN_TUESDAY >>
-			// OLD:
-			// fileOutHandle.write((const char*)&convertedCH2timePS, helpSizeUINT32);
-
-			// NEW: text only ((
-			// fileOutHandle << convertedCH2timePS;
-
-			// NEW: binary
-			// VKORN DESPERATE FLAG >>
-			//fileOutHandle.write(reinterpret_cast<char*>(&convertedCH2timePS), helpSizeUINT32);
 				fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
-				// << VKORN DESPERATE FLAG
-				// VKORN_TUESDAY >>
 
-				// Get new value from file for CH2:  (mark file end if needed:)
-				//if (fileInCh2Handle >> ch2tag >> ch2time)
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+fhOutAuxCh2 << "   " << ch2tag << "   " << ch2time << std::endl;
+#endif
 
+				// LABEL_MODIF_KVV
+				// ToDo: replace "ch2 left" with fscanfSTATUS == EOF (-1).
+				
+				fscanfSTATUS = fread(&ch2tag, helpSizeUINT64, unityForFWRITE, fileInCh2Handle);
+				// freadRESULT = fread(&ch2time, helpSizeDOUBLE, unityForFWRITE, fileInCh2Handle);
+				// if (fscanfSTATUS != EOF)
+				if (fscanfSTATUS == 1)
+				{
+					fscanfSTATUS = fread(&ch2time, helpSizeDOUBLE, unityForFWRITE, fileInCh2Handle);
+				}
 
-				// VKORN DESPERATE FLAG >>
-
-				fread(&ch2tag, helpSizeUINT64, unityForFWRITE, fileInCh2Handle);
-				freadRESULT = fread(&ch2time, helpSizeDOUBLE, unityForFWRITE, fileInCh2Handle);
+				// LABEL EVENING >>>
 
 				CH2left = CH2left - (uint64_t)1;
-
 				// << VKORN_TUESDAY
 
 				// if (fileInCh2Handle.good())
 				// if ((freadRESULT == helpSizeDOUBLE) && (CH2left != 0))
-				if (CH2left > 0)
-					// << VKORN DESPERATE FLAG
-				{
-					if (ch2tag > BUBskipTAG)
+				
+				if (ch2tag > BUBskipTAG)
 					{
 						runFlag = false;
 						// go to flushing the file!
 					}
-					
+				
+				// JJJJJJJJJJJJJJJJ
+				// if ((CH2left > 0) && (fscanfSTATUS != EOF))
+				// if (fscanfSTATUS != EOF)
+				if (fscanfSTATUS == 1)
+				{
 					// O.K.
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
 					cout << "ch2tag: " << ch2tag << " \tch2time: " << ch2time << std::endl;
@@ -2033,81 +2272,78 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 				cout << "ch1 write" << std::endl;
 #endif
 
-				// convertedCH1timePS = (uint32_t)lround(((ch1tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch1time - lastOVFLtime));
-				convertedCH1timePS = (uint32_t)round(((ch1tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch1time - lastOVFLtime));
-				// 1e3: ns -> ps //
+				// 20.12.2021: same changes are applied here:
+				// >>>>>
 
-				// Overflow check:
-				// OLD: // if (convertedCH1timePS > myOverflowVal)
-				// NOW SHOULD BE CAPABLE OF ADDING MULTIPLE OVERFLOW EVENTS //
-				// WITHOUT RUINING UP THE TIME VALUE //
-				while (convertedCH1timePS > myOverflowVal)
+				// <<< before 20.12.2021.
+				// After: >>>
+				auxTimePS = ((ch1tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch1time - lastOVFLtime);
+
+				
+				while (auxTimePS > (double)myOverflowVal)
 				{
-					// increase OVFL marker, recalculate value
-					// hlpOVFLtrunc = ((uint64_t)trunc(((double)myOverflowVal) / inAureaPSin1Tag));
-					// << defined before <while> loop.
-
-#ifdef AureaProcessorPart2OverflowDebuggingMessages
-					cout << "old EVENT time: " << convertedCH1timePS << std::endl;
-					cout << "old OVFL tag = " << lastOVFLtag << " \t" << "old OVFL time = " << lastOVFLtime << std::endl;
+					
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+	#ifdef stage4_Write_Overflow_Flags_ToFile
+	fhOutAuxCh1 << "OVFL_MARKER" << std::endl;
+	#endif
 #endif
 
-					lastOVFLtag = lastOVFLtag + hlpOVFLtrunc;
-					// OLD: // lastOVFLtime = lastOVFLtime + (1e-3) * (((double)myOverflowVal) - (hlpOVFLtrunc * inAureaPSin1Tag));
-
-					// lastOVFLtime = lastOVFLtime + (1e-3) * (((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag));
-					// Nov.20: round to <ps> level:
-					lastOVFLtime = (1.0e-3) * round(lastOVFLtime * 1.0e3 + (((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag)));
-					// NOW: AVERAGED TO UNITS OF PICOSECONDS //
-					// 1e-3: ps -> ns;
-
-					if (lastOVFLtime > (inAureaPSin1Tag * (1.0e-3))) // can occur only once...
-					{
-						lastOVFLtag = lastOVFLtag + (uint32_t)1;
-						// lastOVFLtime = lastOVFLtime - (inAureaPSin1Tag * (1e-3));
-						lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) - inAureaPSin1Tag);
-						// NOW: AVERAGED TO UNITS OF PICOSECONDS //
-					}
-
-#ifdef AureaProcessorPart2OverflowDebuggingMessages
-					cout << "new OVFL tag = " << lastOVFLtag << " \t" << "new OVFL time = " << lastOVFLtime << std::endl;
-#endif
 					// Write an overflow event:
 					convertedCH1timePS = ((uint32_t)0) | myOVFLMask;
-
-					// VKORN_TUESDAY >>
-					// OLD:
-					// fileOutHandle.write((const char*)& convertedCH1timePS, helpSizeUINT32); // OVFL marker written;
-
-					// NEW: text only ((
-					// fileOutHandle << convertedCH1timePS;
-
-					// NEW: binary
-					// VKORN DESPERATE FLAG >>
-					// fileOutHandle.write(reinterpret_cast<char*>(&convertedCH1timePS), helpSizeUINT32); // OVFL marker written;
-					// << VKORN DESPERATE FLAG
 					fwrite(&convertedCH1timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
-					// << VKORN_TUESDAY
-
+					
 					// increase the counter of overflow events;
 					nOVFLmarkersREAL = nOVFLmarkersREAL + ((uint64_t)1);
 					BUBtotalItems = BUBtotalItems + ((uint64_t)1);
-
+					
 					// decrease time by 1 "overflow value":
-					// convertedCH1timePS = (uint32_t)lround(((ch1tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch1time - lastOVFLtime));
-					convertedCH1timePS = (uint32_t)round(((ch1tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch1time - lastOVFLtime));
+					// convertedCH2timePS = (uint32_t)lround(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
+					// convertedCH2timePS = (uint32_t)round(((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - lastOVFLtime));
+					// 1e-3: ps -> ns;
+					
+					// lastOVFLtag = lastOVFLtag + (uint64_t)1;
+					// auxTimePS = auxTimePS - inAureaPSin1Tag;
+					
+					lastOVFLtag = lastOVFLtag + hlpOVFLtrunc;
+					lastOVFLtime = lastOVFLtime + (1e-3)*(((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag));
+						// Nov.20: round to <ps> level:
+						// lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) + (((double)myOverflowVal) - (((double)hlpOVFLtrunc) * inAureaPSin1Tag)));
+						// 1e-3: ps -> ns;
+						// upd: rolled back; NOW: AVERAGED TO UNITS OF PICOSECONDS //
+
+					while (lastOVFLtime > (inAureaPSin1Tag * (1.0e-3))) // can occur only once...
+					// I am putting a 'while' loop, just in case...
+					{
+						
+
+						// LABEL EVENING TYPES >>>
+						// lastOVFLtag = lastOVFLtag + (uint64_t)1;
+						lastOVFLtag = lastOVFLtag + (int64_t)1;
+						// 20.12.2021: VKORN: >>>
+						lastOVFLtime = lastOVFLtime - (inAureaPSin1Tag * (1e-3));
+						// lastOVFLtime = (1.0e-3) * round(lastOVFLtime * (1.0e3) - inAureaPSin1Tag);
+						// upd: rolled back. NOW: AVERAGED TO UNITS OF PICOSECONDS //
+						// <<<
+					}
+
+					
+					
+					// recalculate time (starting from the last overflow moment):
+					auxTimePS = ((ch1tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch1time - lastOVFLtime);
 
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
-					cout << "new EVENT time: " << convertedCH1timePS << std::endl;
+					cout << "new EVENT time: " << convertedCH2timePS << std::endl;
 #endif
 
-				}
+				}	// while overshooting : write overflow events..
 
 				// Just apply the channel mask:
 #ifdef AureaReverseChannelAndTimeData
 				convertedCH1timePS = (convertedCH1timePS << 4) | myCh1Mask; // first Time (MSB), then channel No.
 #else
-				convertedCH1timePS = convertedCH1timePS | myCh1Mask; // first Channel (MSB), then Time
+				// convertedCH1timePS = convertedCH1timePS | myCh1Mask; // first Channel (MSB), then Time
+				 convertedCH1timePS = ((uint32_t)(round(auxTimePS))) | myCh1Mask; // first Channel (MSB), then Time
 #endif
 
 			// fileOutHandle << convertedCH1timePS;
@@ -2123,6 +2359,11 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 			// fileOutHandle.write(reinterpret_cast<char*>(&convertedCH1timePS), helpSizeUINT32);
 			// << VKORN DESPERATE FLAG
 				fwrite(&convertedCH1timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
+
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
+#endif
+
 				// << VKORN_TUESDAY
 
 				// Get new value from file for CH1:  (mark file end if needed:)
@@ -2139,23 +2380,38 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 				// fileInCh1Handle.read(reinterpret_cast<char*>(&ch1tag), helpSizeUINT64);
 				// fileInCh1Handle.read(reinterpret_cast<char*>(&ch1time), helpSizeDOUBLE);
 
-				fread(&ch1tag, helpSizeUINT64, unityForFWRITE, fileInCh1Handle);
-				freadRESULT = fread(&ch1time, helpSizeDOUBLE, unityForFWRITE, fileInCh1Handle);
+				fscanfSTATUS = fread(&ch1tag, helpSizeUINT64, unityForFWRITE, fileInCh1Handle);
+				
+				// LABEL_MODIF_KVV
+				// freadRESULT = fread(&ch1time, helpSizeDOUBLE, unityForFWRITE, fileInCh1Handle);
+				if (fscanfSTATUS == 1)
+				{
+					fscanfSTATUS = fread(&ch1time, helpSizeDOUBLE, unityForFWRITE, fileInCh1Handle);
+				}
+				// <<<
+				// ToDo: replace "freadRESULT" with "fscanfSTATUS == 0 or EoF (-1)."
 
 				CH1left = CH1left - (uint64_t)1;
 
 				// << VKORN_TUESDAY
 				// if (fileInCh1Handle.good())
-
-				// if ((freadRESULT != helpSizeDOUBLE) && (CH1left != 0))
-				if (CH1left > 0)
-					// << VKORN DESPERATE FLAG
-				{
-					if (ch1tag > BUBskipTAG)
+				
+				// LABEL EVENING >>>
+				
+				if (ch1tag > BUBskipTAG)
 					{
 						runFlag = false;
 						// go to flushing the file!
 					}
+				
+				// if ((freadRESULT != helpSizeDOUBLE) && (CH1left != 0))
+				
+				// JJJJJJJJJJJJJJJJ
+				// if ((CH1left > 0) && (fscanfSTATUS != EOF))
+				if (fscanfSTATUS == 1)
+				// if (fscanfSTATUS != EOF)
+					// << VKORN DESPERATE FLAG
+				{
 					// O.K.
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
 					cout << "ch1tag: " << ch1tag << " \tch1time: " << ch1time << std::endl;
@@ -2198,7 +2454,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 		// REWRITE THE HEADER WITH THE GIVEN MEAS_TIME AND N_EVENTS >>>>
 		// >>>>>>>>>>>>>>>>>>>
 
-		Sleep(1000);
+		Sleep(500);
 
 		OutOutOuttemp.open(BUBcurrOutputFileName.c_str());
 		// std::ios_base::out | std::ios_base::in
@@ -2271,20 +2527,28 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 		Sleep(500);
 		OutOutOuttemp.close();
 
-} // MAIN NEW CYCLE
+	} // MAIN NEW CYCLE    (For <file> in <files> ...)
+	
 	// HERE GOES THE END OF THE FOR LOOP //
-	// RRRRRRRRRRRRRRRRRR
-
-
+	
 	// <<<<<<<<<<<<<<<<<<<<<<<<<
 	// <<<< REWRITE THE HEADER
 
-	// RRRRRRRRRRRRRRRRR
-
+	
 	cout << "closing the files" << std::endl;
 
 	fclose(fileInCh1Handle);
 	fclose(fileInCh2Handle);
+
+// LLLLLLLLLLL
+#ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
+	// closing files with directly back-converted time and tag values.
+	fhOutAuxCh1.flush();
+	fhOutAuxCh2.flush();
+	
+	fhOutAuxCh1.close();
+	fhOutAuxCh2.close();
+#endif
 
 	return 0;
 }
@@ -2292,5 +2556,198 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 
 
+
+
+
+
+
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
+//	*				Reverse converter (for checking the consistency...)			*	//
+//	*																			*	//
+//	*									[ Stage 4. ]							*	//
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
+
+
+int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2
+
+	// 20.12.: header processing will be added later.
+	// , const char* fileOutNameCh2
+	// , const char* fileOutNameHEADER
+
+)
+
+{
+	// I/O help "constants":
+	std::size_t	helpSizeUINT32 = sizeof(uint32_t);
+	std::size_t	helpSizeDOUBLE = sizeof(double);
+	std::size_t	helpSizeUINT64 = sizeof(uint64_t);
+	std::size_t unityForFWRITE = 1;
+
+	// channel masks:
+#ifdef AureaReverseChannelAndTimeData
+	uint32_t	myCh1Mask = ((uint32_t)0); // number of channel (from 0) NOT shifted by N_bits_TimeTag to the left.
+	uint32_t	myCh2Mask = ((uint32_t)1); // number of channel (from 0) NOT shifted by N_bits_TimeTag to the left.
+	uint32_t	myOVFLMask = ((uint32_t)15);  // LSB;	// = 28 times 0b0, then 0b1111.
+#else
+	uint32_t	myCh1Mask = ((uint32_t)0) << 28; // number of channel (from 0) shifted by N_bits_TimeTag to the left.
+	uint32_t	myCh2Mask = ((uint32_t)1) << 28; // number of channel (from 0) shifted by N_bits_TimeTag to the left.
+	uint32_t	myOVFLMask = ((uint32_t)15) << 28; // MSB;	// = 0b1111 + 28 more bit values.
+#endif
+
+	// prepare files:
+	std::ofstream fileOutCh1AUREA(fileOutCh1);
+	if (!fileOutCh1AUREA.is_open())
+		{
+			cout << "Error opening file for output (Ch.1)." << std::endl;
+			return 1;
+		}
+	
+	std::ofstream fileOutCh2AUREA(fileOutCh2);
+	if (!fileOutCh2AUREA.is_open())
+		{
+			cout << "Error opening file for output (Ch.2)." << std::endl;
+			fileOutCh1AUREA.close();
+			return 1;
+		}
+
+	FILE* fileInHandle;
+	fileInHandle = fopen(fileInNamePTU, "rb");
+	if (fileInHandle == NULL) {
+		fileOutCh1AUREA.close();
+		fileOutCh2AUREA.close();
+		cout << "Error opening input file." << std::endl;
+		return 1;
+	}
+
+	fseek(fileInHandle, 256, SEEK_SET);
+	// ToDo: replace with finding the header end... ;
+
+	bool runFlag = true;
+	
+	// JJJJJJJJJJJJJJJJ
+	// int	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
+	std::size_t	 fscanfSTATUS = 0;	// other option: EOF = -1. // most probably.
+
+	std::stringstream ossTMP;
+	std::string line = "initial_value";
+	ossTMP.str(line);
+
+	uint64_t currTAG = 0;		// reading from file, converting to tags and times
+	double currTIMEps = 0.0;	// ps
+	
+	uint32_t PTUrecord = 0;	// will be used for extracting the data from PTU-file.
+
+	const uint64_t T2WRAPAROUND = 210698240;	// ToDo: change to 2^28 here and in pre-processor (Aurea).
+	
+	int PTUchannel = 0;		
+	uint32_t PTUtimePS = 0;	// number of picoseconds, as read from the record.
+	
+	double PTUcurrTimeExcessPS = 0.0;	// increased when overflow marker in PTU file,
+										// decreased when (% + time) > myPSin1tag.
+										// Can be negative.
+
+	
+	double myPSin1tag;
+	myPSin1tag = (1.0 / (double)625000) * 1e+12; // ps
+	// ToDo:
+	// manually programmed to 625 kHz
+	// replace with input from main program (later)
+
+
+	fscanfSTATUS = fread(&PTUrecord, helpSizeUINT32, unityForFWRITE, fileInHandle);
+	// JJJJJJJJJJJJJJJJ
+	// if (fscanfSTATUS == EOF)
+	if (fscanfSTATUS != 1)
+		{
+			runFlag = false;
+		}
+
+	while (runFlag)
+	{
+		
+		// apply channel and overflow marker masks; process accordingly
+		if ((PTUrecord >> 28) == (uint32_t)15) //this means we have a special record
+		{
+			// overflow event
+			
+			// markers not implemented //
+			
+			// PTUtimePS = 0;	>> not needed now...
+			// PTUchannel = -1;	>> also not needed...
+			PTUcurrTimeExcessPS = PTUcurrTimeExcessPS + (double)T2WRAPAROUND;
+			// unwrap the time tag overflow	
+
+#ifdef stage4_Write_Overflow_Flags_ToFile
+				ossTMP.str("OVFL_MARKER\n");
+				fileOutCh1AUREA << ossTMP.str();
+				fileOutCh2AUREA << ossTMP.str();
+#endif
+
+		}
+		else
+		{
+			// regular event - read, convert time, update time base marker, write to AureaFile
+			
+			// PTUtimePS = *oflcorrection + (record & (~(((uint32_t)15) << 28)));
+			PTUtimePS = PTUrecord & (~(((uint32_t)15) << 28));
+			PTUchannel = (int)(PTUrecord >> 28);	
+
+			// convert input data to TAGS and TIMES:
+			// each time we increment a tag (+=1), we decrement <PTUcurrTimeExcessPS> (-= myPSin1tag)
+			currTIMEps = ((double)PTUtimePS) + PTUcurrTimeExcessPS;
+			while (currTIMEps > myPSin1tag)
+			{
+				currTIMEps = currTIMEps - myPSin1tag;
+				PTUcurrTimeExcessPS = PTUcurrTimeExcessPS - myPSin1tag;
+				currTAG = currTAG + (uint64_t)1;
+			}
+
+			// output to file:
+			// sprintf(line.c_str(), "\t%d\t%f\n", currTAG, currTIME);
+			ossTMP.str("");
+			currTIMEps = currTIMEps / 1000.;
+			ossTMP << currTAG << "\t" << currTIMEps << std::endl;
+			
+			if (PTUchannel == 0)
+			{
+				// Ch.1
+				fileOutCh1AUREA << ossTMP.str();
+			}
+			else
+			{
+				// Ch.2
+				fileOutCh2AUREA << ossTMP.str();
+			}
+
+		}	// << regular event
+
+
+		// fetch next record:
+
+		fscanfSTATUS = fread(&PTUrecord, helpSizeUINT32, unityForFWRITE, fileInHandle);
+		
+		// cout << fscanfSTATUS << " ";
+
+		//if (!fileInHandle.good())
+		// if (fileInHandle.eof())
+		// if (fscanfSTATUS == EOF)
+
+		// JJJJJJJJJJJJJJJJ
+		// if (!fscanfSTATUS)
+		if (fscanfSTATUS != 1)
+		{
+			runFlag = false;
+		}
+				
+	} // while (runFlag);
+
+	fclose(fileInHandle);
+	fileOutCh1AUREA.flush();
+	fileOutCh2AUREA.flush();
+	fileOutCh1AUREA.close();
+	fileOutCh2AUREA.close();
+
+	return 0;
+}
 
 // .EOF
