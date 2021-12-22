@@ -2226,6 +2226,8 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 #endif
 
 				fwrite(&convertedCH2timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
+				BUBtotalItems = BUBtotalItems + ((uint64_t)1);
+				// increase the number of records written to file...
 
 #ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
 fhOutAuxCh2 << "   " << ch2tag << "   " << ch2time << std::endl;
@@ -2369,6 +2371,9 @@ fhOutAuxCh2 << "   " << ch2tag << "   " << ch2time << std::endl;
 			// fileOutHandle.write(reinterpret_cast<char*>(&convertedCH1timePS), helpSizeUINT32);
 			// << VKORN DESPERATE FLAG
 				fwrite(&convertedCH1timePS, helpSizeUINT32, unityForFWRITE, NEWOutHandle);
+
+				BUBtotalItems = BUBtotalItems + ((uint64_t)1);
+				// increase the number of records written to file...
 
 #ifdef stage3_DEBUG_re_create_files_with_text_tag_time_values
 fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
