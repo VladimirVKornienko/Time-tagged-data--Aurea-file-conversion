@@ -28,6 +28,12 @@
 
 // [<MeasurementTime>] == milliseconds ??!? //
 
+#ifndef decUseStringReplacement
+#define decUseStringReplacement
+// uncomment to remove "e+0" entries -> replacing them with "e+".
+#endif
+
+
 #ifndef AureaProcessorPart2OverflowDebuggingMessages
 //#define AureaProcessorPart2OverflowDebuggingMessages
 // << uncomment to use debugging on first 10 records. //
@@ -310,6 +316,11 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	//double PREVch2time = 0;
 	//// <<<<
 
+	// Dec. 25 >>
+	size_t myFindPosVal;
+	// Dec. 25 <<<
+
+
 	int64_t ch1tag = 0;
 	double ch1time = 0.0;
 	int64_t ch2tag = 0;
@@ -410,6 +421,17 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		
 		// LABEL EVENING TYPES >>>
 		// numArgsRead = sscanf(line.c_str(), "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);		
+		
+		
+		// Dec. 25 >>>
+#ifdef decUseStringReplacement
+		while ((myFindPosVal = line.find("e+0"), myFindPosVal) == string::npos)
+		{
+			line.replace(myFindPosVal, sizeof("e+0") - 1, "e+");
+		}
+#endif
+		// Dec. 25 <<<
+
 		numArgsRead = sscanf(line.c_str(), "%lld %lf %lld %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);
 		
 		
