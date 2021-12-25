@@ -108,6 +108,13 @@ int main(int argc, char ** argv)
 		// // fname03out2 = "Z:\\Documents\\ForPiton\\VCC_input_data\\demo_out_ch2.txt";
 		// // fname03out3header = "Z:\\Documents\\ForPiton\\VCC_input_data\\demo_out_header.txt";
 		// <<< //
+
+		fname01in = "Z:\\Documents\\ForPiton\\VCC_input_data\\Dec25\\s11f05a.txt";
+		fname02out1 = "Z:\\Documents\\ForPiton\\VCC_input_data\\Dec25\\demo_out_ch1.txt";
+		fname03out2 = "Z:\\Documents\\ForPiton\\VCC_input_data\\Dec25\\demo_out_ch2.txt";
+		fname03out3header = "Z:\\Documents\\ForPiton\\VCC_input_data\\Dec25\\demo_out_header.txt";
+		fname04result = "Z:\\Documents\\ForPiton\\VCC_input_data\\Dec25\\demo_RESULT.dat";
+
 	}
 
 	cout << "in: " << fname01in << std::endl;
@@ -121,6 +128,7 @@ int main(int argc, char ** argv)
 
 	double dPSin1Tag = 0.;
 
+	
 	
 	// see below: bit representation (1); bit masks (2); //
 	// file I/O ver1 basic (3); file I/O: input and output file streams (4); //
@@ -226,7 +234,7 @@ int main(int argc, char ** argv)
 	//	fname03out2.c_str(), fname03out3header.c_str(), dPSin1Tag,
 	//	MeasTime, NcntsCh1, NcntsCh2, &MAINnOVFLmarkersESTIMATE, &MAINnOVFLmarkersREAL);
 	
-
+	// return 0;
 	
 	// double SECONDStoSPLIT = 60.0; // seconds
 	double SECONDStoSPLIT = MeasTime * 1e-3; // seconds

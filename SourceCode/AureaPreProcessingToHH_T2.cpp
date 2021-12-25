@@ -29,7 +29,7 @@
 // [<MeasurementTime>] == milliseconds ??!? //
 
 #ifndef decUseStringReplacement
-#define decUseStringReplacement
+// #define decUseStringReplacement
 // uncomment to remove "e+0" entries -> replacing them with "e+".
 #endif
 
