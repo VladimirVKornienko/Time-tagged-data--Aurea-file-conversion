@@ -8,8 +8,8 @@
 
 //	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
 //		Stage1 (+) splits the file in three + extracts PSin1Tag, MeasTime, Nch1, Nch2 from the file.		//
-//		Stage2 (+) gets some of those parameters as inputs, and makes a *.PTU file in reqired format.		//
-//		Stage3 (not ready / unstable) is same to Stage2, but splits the initial file in chunks of			//
+//		Stage2 (obsolete) gets some of those parameters as inputs, and makes a *.PTU file in reqired format.		//
+//		Stage3 (+) is same to Stage2, but splits the initial file in chunks of			//
 //																		<TimeToSplitSEC> time chunks each.	//
 //	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
 
@@ -132,6 +132,9 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	
 	double myUpperDiscrLevel = 0; // ns (!) // Will mainly be used for checking the wrong values of Times... //
 	double myAureaFreq = 0; // to be more flexible... though unsigned long should be enough.
+
+	std::size_t myFindResult; // for replacing "123e+07" with "123e+7".
+	
 
 	// >>>>>>>>>>
 	// The line below can be used (it is believed to speed up the execution), 
@@ -408,6 +411,23 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		// unsigned long long int == "%llu", double in e-format == "%le". // (I hope!) //
 		// numArgsRead = sscanf(line, "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);
 		
+		
+		// 02.01.2022: replace "123e+07" with "123e+7", and "123e-07" with "123e-7"
+		// std::size_t myFindResult;
+		myFindResult = line.find("e+0",0);
+		if (myFindResult != string::npos)
+    	{
+        	line = line.replace(myFindResult, 3, "e+");
+			// Length is 3, which skips the last symbol, i.e. '0'. So "e+07" -> "e+7".
+    	}
+		
+		myFindResult = line.find("e-0",0);
+		if (myFindResult != string::npos)
+    	{
+        	line = line.replace(myFindResult, 3, "e-");
+			// Length is 3, which skips the last symbol, i.e. '0'. So "e+07" -> "e+7".
+    	}
+    
 		// LABEL EVENING TYPES >>>
 		// numArgsRead = sscanf(line.c_str(), "%llu %lf %llu %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);		
 		numArgsRead = sscanf(line.c_str(), "%lld %lf %lld %lf", &ch1tag, &ch1time, &ch2tag, &ch2time);
