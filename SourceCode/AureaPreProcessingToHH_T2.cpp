@@ -942,7 +942,7 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	
 	// we want: rtPicoHarpT2     = 0x00010203,  # (SubID = $00 ,RecFmt: $01) (V1), T-Mode: $02 (T2), HW: $03 (PicoHarp)
 	// fileOutHandle.write((const char*)TagRECTYPE.c_str(), (TagRECTYPE.length())*sizeof(char));
-	fileOutHandle.write((const char*)TagRECTYPE.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagRECTYPE.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	fileOutHandle.write((const char*)&outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 	// tyAnsiString  = 0x4001FFFF, tyBinaryBlob  = 0xFFFFFFFF
@@ -952,7 +952,7 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	fileOutHandle.write((const char*)& outputValueUINT64, sizeof(uint64_t));
 	
 	// fileOutHandle.write((const char*)TagNUMREC.c_str(), (TagNUMREC.length()) * sizeof(char));
-	fileOutHandle.write((const char*)TagNUMREC.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagNUMREC.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	fileOutHandle.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 	fileOutHandle.write((const char*)& outputType, sizeof(uint32_t));
@@ -962,7 +962,7 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	fileOutHandle.write((const char*)&ui64TempOutput, sizeof(uint64_t));
 
 	// fileOutHandle.write((const char*)TagGLOBRES.c_str(), (TagGLOBRES.length()) * sizeof(char));
-	fileOutHandle.write((const char*)TagGLOBRES.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagGLOBRES.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char)))   ;
 	fileOutHandle.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x20000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 	fileOutHandle.write((const char*)& outputType, sizeof(uint32_t));
@@ -970,7 +970,7 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	fileOutHandle.write((const char*)& outputValueDOUBLE, sizeof(double));
 
 	// fileOutHandle.write((const char*)TagACQTIME.c_str(), (TagACQTIME.length()) * sizeof(char));
-	fileOutHandle.write((const char*)TagACQTIME.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagACQTIME.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	fileOutHandle.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // uint64_t ??? picoseconds??? //
 	fileOutHandle.write((const char*)& outputType, sizeof(uint32_t));
@@ -984,7 +984,7 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	// << VKORN_TUESDAY
 
 	// fileOutHandle.write((const char*)TagHEADEREND.c_str(), (TagHEADEREND.length()) * sizeof(char));
-	fileOutHandle.write((const char*)TagHEADEREND.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagHEADEREND.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	fileOutHandle.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008. // here -- any.
 	fileOutHandle.write((const char*)&outputType, sizeof(uint32_t));
@@ -1525,7 +1525,7 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	OutOutOuttemp.write((const char*)TagPREHEADER16bytes.c_str(), (TagPREHEADER16bytes.length()) * sizeof(char));
 	
 	// we want: rtPicoHarpT2     = 0x00010203,  # (SubID = $00 ,RecFmt: $01) (V1), T-Mode: $02 (T2), HW: $03 (PicoHarp)
-	OutOutOuttemp.write((const char*)TagRECTYPE.c_str(), AUREABytesInATagName * sizeof(char));
+	OutOutOuttemp.write(   (const char*)TagRECTYPE.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 	// tyAnsiString  = 0x4001FFFF, tyBinaryBlob  = 0xFFFFFFFF
@@ -1534,7 +1534,7 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	// rtHydraHarpT2 = 0x00010204, # (SubID = $00, RecFmt: $01) (V1), T - Mode: $02(T2), HW : $04(HydraHarp)
 	OutOutOuttemp.write((const char*)& outputValueUINT64, sizeof(uint64_t));
 
-	OutOutOuttemp.write((const char*)TagNUMREC.c_str(), AUREABytesInATagName * sizeof(char));
+	OutOutOuttemp.write(   (const char*)TagNUMREC.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 	OutOutOuttemp.write((const char*)& outputType, sizeof(uint32_t));
@@ -1546,14 +1546,14 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	
 	OutOutOuttemp.write((const char*)& ui64TempOutput, sizeof(uint64_t));
 
-	OutOutOuttemp.write((const char*)TagGLOBRES.c_str(), AUREABytesInATagName * sizeof(char));
+	OutOutOuttemp.write(   (const char*)TagGLOBRES.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x20000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 	OutOutOuttemp.write((const char*)& outputType, sizeof(uint32_t));
 	outputValueDOUBLE = ((double)AUREAGlobalResolution);	// in seconds; DEFAULT!
 	OutOutOuttemp.write((const char*)& outputValueDOUBLE, sizeof(double));
 
-	OutOutOuttemp.write((const char*)TagACQTIME.c_str(), AUREABytesInATagName * sizeof(char));
+	OutOutOuttemp.write(   (const char*)TagACQTIME.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // uint64_t ??? picoseconds??? //
 	OutOutOuttemp.write((const char*)& outputType, sizeof(uint32_t));
@@ -1564,7 +1564,7 @@ int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1
 	OutOutOuttemp.write((const char*)& outputValueUINT64, sizeof(uint64_t));
 	// << VKORN_TUESDAY
 
-	OutOutOuttemp.write((const char*)TagHEADEREND.c_str(), AUREABytesInATagName * sizeof(char));
+	OutOutOuttemp.write(   (const char*)TagHEADEREND.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008. // here -- any.
 	OutOutOuttemp.write((const char*)& outputType, sizeof(uint32_t));
@@ -1770,7 +1770,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	// we want: rtPicoHarpT2     = 0x00010203,  # (SubID = $00 ,RecFmt: $01) (V1), T-Mode: $02 (T2), HW: $03 (PicoHarp)
 	// fileOutHandle.write((const char*)TagRECTYPE.c_str(), (TagRECTYPE.length())*sizeof(char));
-	fileOutHandle.write((const char*)TagRECTYPE.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagRECTYPE.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	fileOutHandle.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 	// tyAnsiString  = 0x4001FFFF, tyBinaryBlob  = 0xFFFFFFFF
@@ -1780,7 +1780,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	fileOutHandle.write((const char*)& outputValueUINT64, sizeof(uint64_t));
 
 	// fileOutHandle.write((const char*)TagNUMREC.c_str(), (TagNUMREC.length()) * sizeof(char));
-	fileOutHandle.write((const char*)TagNUMREC.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagNUMREC.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	fileOutHandle.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 	fileOutHandle.write((const char*)& outputType, sizeof(uint32_t));
@@ -1790,7 +1790,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	fileOutHandle.write((const char*)& ui64TempOutput, sizeof(uint64_t));
 
 	// fileOutHandle.write((const char*)TagGLOBRES.c_str(), (TagGLOBRES.length()) * sizeof(char));
-	fileOutHandle.write((const char*)TagGLOBRES.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagGLOBRES.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	fileOutHandle.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x20000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 	fileOutHandle.write((const char*)& outputType, sizeof(uint32_t));
@@ -1798,7 +1798,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	fileOutHandle.write((const char*)& outputValueDOUBLE, sizeof(double));
 
 	// fileOutHandle.write((const char*)TagACQTIME.c_str(), (TagACQTIME.length()) * sizeof(char));
-	fileOutHandle.write((const char*)TagACQTIME.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagACQTIME.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	fileOutHandle.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // uint64_t ??? picoseconds??? //
 	fileOutHandle.write((const char*)& outputType, sizeof(uint32_t));
@@ -1816,7 +1816,7 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	// << VKORN_TUESDAY
 
 	// fileOutHandle.write((const char*)TagHEADEREND.c_str(), (TagHEADEREND.length()) * sizeof(char));
-	fileOutHandle.write((const char*)TagHEADEREND.c_str(), AUREABytesInATagName * sizeof(char));
+	fileOutHandle.write(   (const char*)TagHEADEREND.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 	fileOutHandle.write((const char*)& outputIdx, sizeof(int32_t));
 	outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008. // here -- any.
 	fileOutHandle.write((const char*)& outputType, sizeof(uint32_t));
@@ -2510,7 +2510,7 @@ fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
 		OutOutOuttemp.write((const char*)TagPREHEADER16bytes.c_str(), (TagPREHEADER16bytes.length()) * sizeof(char));
 
 		// we want: rtPicoHarpT2     = 0x00010203,  # (SubID = $00 ,RecFmt: $01) (V1), T-Mode: $02 (T2), HW: $03 (PicoHarp)
-		OutOutOuttemp.write((const char*)TagRECTYPE.c_str(), AUREABytesInATagName * sizeof(char));
+		OutOutOuttemp.write(   (const char*)TagRECTYPE.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 		OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 		outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 		// tyAnsiString  = 0x4001FFFF, tyBinaryBlob  = 0xFFFFFFFF
@@ -2519,7 +2519,7 @@ fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
 		// rtHydraHarpT2 = 0x00010204, # (SubID = $00, RecFmt: $01) (V1), T - Mode: $02(T2), HW : $04(HydraHarp)
 		OutOutOuttemp.write((const char*)& outputValueUINT64, sizeof(uint64_t));
 
-		OutOutOuttemp.write((const char*)TagNUMREC.c_str(), AUREABytesInATagName * sizeof(char));
+		OutOutOuttemp.write(   (const char*)TagNUMREC.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 		OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 		outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 		OutOutOuttemp.write((const char*)& outputType, sizeof(uint32_t));
@@ -2532,14 +2532,14 @@ fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
 
 		OutOutOuttemp.write((const char*)& ui64TempOutput, sizeof(uint64_t));
 
-		OutOutOuttemp.write((const char*)TagGLOBRES.c_str(), AUREABytesInATagName * sizeof(char));
+		OutOutOuttemp.write(   (const char*)TagGLOBRES.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 		OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 		outputType = 0x20000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008.
 		OutOutOuttemp.write((const char*)& outputType, sizeof(uint32_t));
 		outputValueDOUBLE = ((double)AUREAGlobalResolution);	// in seconds; DEFAULT!
 		OutOutOuttemp.write((const char*)& outputValueDOUBLE, sizeof(double));
 
-		OutOutOuttemp.write((const char*)TagACQTIME.c_str(), AUREABytesInATagName * sizeof(char));
+		OutOutOuttemp.write(   (const char*)TagACQTIME.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 		OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 		outputType = 0x10000008; // uint64_t ??? picoseconds??? //
 		OutOutOuttemp.write((const char*)& outputType, sizeof(uint32_t));
@@ -2556,7 +2556,7 @@ fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
 		OutOutOuttemp.write((const char*)& outputValueUINT64, sizeof(uint64_t));
 		// << VKORN_TUESDAY
 
-		OutOutOuttemp.write((const char*)TagHEADEREND.c_str(), AUREABytesInATagName * sizeof(char));
+		OutOutOuttemp.write(   (const char*)TagHEADEREND.c_str(), (std::streamsize)(AUREABytesInATagName * sizeof(char))   );
 		OutOutOuttemp.write((const char*)& outputIdx, sizeof(int32_t));
 		outputType = 0x10000008; // tyInt8 = 0x10000008; tyFloat8 = 0x20000008. // here -- any.
 		OutOutOuttemp.write((const char*)& outputType, sizeof(uint32_t));

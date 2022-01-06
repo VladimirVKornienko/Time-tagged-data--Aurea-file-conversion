@@ -75,5 +75,7 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 #define CONSTANTS_H
 
 extern const uint32_t myOverflowVal;
+extern const int AUREABytesInATagName;
+extern const double AUREAGlobalResolution;
 
 #endif
