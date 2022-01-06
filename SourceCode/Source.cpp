@@ -9,6 +9,7 @@ using namespace std;
 // For running from IDE, use "else" statement for manually enetring the filenames.
 
 int main(int argc, char ** argv) 
+//int testfun(int argc, char ** argv)	// temp., for compiling other files. //
 {
 	std::vector<std::string> args(argv, argv + argc);
 	// VER1 :

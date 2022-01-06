@@ -1,4 +1,5 @@
 #pragma once
+// using namespace std;
 
 // 2 parts: inludes and function prototypes. //
 
