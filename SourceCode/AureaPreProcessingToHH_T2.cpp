@@ -20,13 +20,22 @@
 // VKORN_TUESDAY >>
 // <<< Label for the recent changes in file I/O: from "write" to "<<".
 
+/*
+Moved to constants.cpp and header file.
 
 #define AUREABytesInATagName	32	// for formatting the header file.
 #define AUREAGlobalResolution	1.0e-12 // in seconds; universal, everywhere here...
+*/
 
 // Nov.20: for "Stage2", added rounding to the nearest ps value: value = round( value * 1000.0 ) / 1000.0;
 
 // [<MeasurementTime>] == milliseconds ??!? //
+
+
+//	*	*	*	*	*	*	*	*	*	*	*	//
+//	*	Debug flags (uncomment to use):		*	//
+//	*	*	*	*	*	*	*	*	*	*	*	//
+
 
 #ifndef AureaProcessorPart2OverflowDebuggingMessages
 //#define AureaProcessorPart2OverflowDebuggingMessages
@@ -64,6 +73,10 @@
 // NB! works only for the last file in a batch (matter of simplicity, and enough for debugging).
 #endif
 
+/*
+06.01.: moved to the header file:
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstdint>
@@ -74,26 +87,19 @@
 #include <sstream>
 #include <string>
 
-#include "KVV_Header.h"
-
 #include <bitset>		// for binary representations >> debug only, most likely.
 
 #include <iomanip>		// for outputting the floast to required precision with 'cout' etc.
 
-#include <math.h>       /* lround */
+#include <math.h>       // lround
 
 #include <algorithm>		// std::max
 
-// #include <windows.h> 
-// for Sleep(milliseconds); //
+*/
+
+#include "KVV_Header.h"
 
 using namespace std;
-
-// #include <filesystem>
-// namespace fs = std::filesystem;	// DOES NOT WORK :: TO YOUNG...
-// << for copying files...
-// << DOES NOT WORK :: TOO YOUNG AN UPDATE, <FILESYSTEM>
-
 
 
 

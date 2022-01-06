@@ -1,48 +1,54 @@
 #pragma once
-// int PreProcessAureaData(const char* fileInName, const char* fileOutName);
 
-//int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1, const char* fileOutNameCh2,
-//	const char* fileOutNameHEADER, double* outAureaPSin1Tag);
+// 2 parts: inludes and function prototypes. //
 
-#ifndef NOMINMAX
+#ifndef _CRT_SECURE_NO_WARNINGS		// for using "scanf", if not defined in pre-compiler options
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+//	*	*	*	*	*	*	*	*	//
+//	*	1. 'include' part:		*	//
+//	*	*	*	*	*	*	*	*	//
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <string>
+#include <cstdint>		// for "uint32_t" type_def //
+#include <vector>		// for std::vector<std::string> args(argv, argv + argc);
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+#include <iomanip>		// for outputting the float to required precision with 'cout' etc.
+#include <bitset>		// for binary representations >> debug only, most likely.
+// e.g.: std::cout << "a = " << std::bitset<8>(a)  << std::endl;
+// Use example:
+// cout << std::fixed << std::setprecision(2);
+// revert:
+// file1.unsetf(ios_base::fixed);
+// file1 << std::setprecision(16) << thePoint[2];
+
+#include <math.h>       // lround
+#include <algorithm>	// std::max
+
+#ifndef NOMINMAX		// for <windows.h>: otherwise, std::max will be unavailable... //
 	#define NOMINMAX
 #endif
-// << otherwise, std::max will be unavailable...
+#include <windows.h>	// for Sleep(milliseconds); //
 
 
-#include <windows.h>
-// for Sleep(milliseconds); //
-
-// VKORN_TUESDAY >>
-
-//int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1, const char* fileOutNameCh2,
-//	const char* fileOutNameHEADER, double* outAureaPSin1Tag,
-//	uint64_t* outMeasTime, uint64_t* NcntsCh1, uint64_t* NcntsCh2,
-//	uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped);
+//	*	*	*	*	*	*	*	*	*	*	*	//
+//	*	2. function declaration part:		*	//
+//	*	*	*	*	*	*	*	*	*	*	*	//
 
 int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1, const char* fileOutNameCh2,
 	const char* fileOutNameHEADER, double* outAureaPSin1Tag,
 	double* outMeasTime, uint64_t* NcntsCh1, uint64_t* NcntsCh2,
 	uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped);
-// << VKORN_TUESDAY
 
 
-//int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1, const char* fileInNameCh2,
-//	const char* fileInNameHEADER, double inAureaPSin1Tag);
-
-//int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1, const char* fileInNameCh2,
-//	const char* fileInNameHEADER, double inAureaPSin1Tag,
-//	uint64_t outMeasTime, uint64_t NcntsTOT);
-
-// new! gives 2 more arguments: estimated and real number of markers.
-// currently, EST is added to the file header...
-
-
-// VKORN_TUESDAY >>
-//int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1, const char* fileInNameCh2,
-//	const char* fileInNameHEADER, double inAureaPSin1Tag,
-//	uint64_t outMeasTime, uint64_t NcntsTOT,
-//	uint64_t* OUTnOVFLmarkersESTIMATE, uint64_t* OUTnOVFLmarkersREAL);
 
 int PreProcessAureaDataStage2(const char* fileOutName, const char* fileInNameCh1, const char* fileInNameCh2,
 	const char* fileInNameHEADER, double inAureaPSin1Tag,
@@ -54,7 +60,6 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	const char* fileInNameHEADER, double inAureaPSin1Tag,
 	double inMeasTime, uint64_t Ncnts1, uint64_t Ncnts2,
 	uint64_t* OUTnOVFLmarkersESTIMATE, uint64_t* OUTnOVFLmarkersREAL);
-// << VKORN_TUESDAY
 
 
 int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2
@@ -64,6 +69,7 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 	// , const char* fileOutNameHEADER
 
 );
+
 
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
