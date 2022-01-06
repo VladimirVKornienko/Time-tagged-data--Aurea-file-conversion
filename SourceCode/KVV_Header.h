@@ -38,6 +38,11 @@
 #endif
 #include <windows.h>	// for Sleep(milliseconds); //
 
+#ifndef	DEBUG_MESSAGES_FILE_INCLUDED		// for using the debug options from "DebugMessages.h" //
+	#define DEBUG_MESSAGES_FILE_INCLUDED
+	#include "DebugMessages.h"
+#endif
+
 
 //	*	*	*	*	*	*	*	*	*	*	*	//
 //	*	2. function declaration part:		*	//
@@ -71,8 +76,8 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 );
 
 
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef CONSTANTS_CPP_INCLUDED
+#define CONSTANTS_CPP_INCLUDED
 
 extern const uint32_t myOverflowVal;
 extern const int AUREABytesInATagName;
