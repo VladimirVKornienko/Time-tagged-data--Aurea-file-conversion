@@ -1,5 +1,6 @@
+#include "KVV_Header.h"
 
-
+using namespace std;
 
 
 //	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
@@ -9,15 +10,15 @@
 //	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
 
 
-int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2
+int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2)
 
 	// 20.12.: header processing will be added later.
 	// , const char* fileOutNameCh2
 	// , const char* fileOutNameHEADER
 
-)
-
 {
+	
+	
 	// I/O help "constants":
 	std::size_t	helpSizeUINT32 = sizeof(uint32_t);
 	std::size_t	helpSizeDOUBLE = sizeof(double);

@@ -67,14 +67,11 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	double inMeasTime, uint64_t Ncnts1, uint64_t Ncnts2,
 	uint64_t* OUTnOVFLmarkersESTIMATE, uint64_t* OUTnOVFLmarkersREAL);
 
+int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2);
+// 20.12.: header processing will be added later.
+// , const char* fileOutNameCh2
+// , const char* fileOutNameHEADER
 
-int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2
-
-	// 20.12.: header processing will be added later.
-	// , const char* fileOutNameCh2
-	// , const char* fileOutNameHEADER
-
-);
 
 
 #ifndef CONSTANTS_CPP_INCLUDED

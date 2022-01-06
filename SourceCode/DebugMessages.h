@@ -4,6 +4,12 @@
 //	*	Debug flags (uncomment to use):		*	//
 //	*	*	*	*	*	*	*	*	*	*	*	//
 
+#ifndef use_back_conversion_of_stage_4
+#define use_back_conversion_of_stage_4
+// uncomment to use back-conversion from PTU format to AUREA intrinsic format.
+#endif
+
+
 #ifndef stage4_Write_Overflow_Flags_ToFile
 #define stage4_Write_Overflow_Flags_ToFile
 
