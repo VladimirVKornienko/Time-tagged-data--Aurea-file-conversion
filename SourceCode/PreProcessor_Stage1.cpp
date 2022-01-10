@@ -81,8 +81,10 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	
 	//   >>>   DEFINE THESE !!  >>>   //
 	const char myFreqLine[] = "%   Sync freq:";	// header prefix before the Sync. freq.
-	double myUpperDiscrLevelFraction = 1.00;	// a fraction of the (1/freq), will be calculated later
+	double myUpperDiscrLevelFraction = 2.50;	// a fraction of the (1/freq), will be calculated later
 												// all delays above that value will be treated as erroneous records.
+	// previous value: 1.00. Due to rounding errors, some points were missing, maybe.
+
 
 	double myLowerDiscrLevel = 1.0e-6;			// entered manually
 	//   <<<   DEFINE THESE !!  <<<   //
@@ -248,8 +250,12 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 					// cout << "found one!" << std::endl;
 					// cout << "Start pos is" << StrSearchPos << std::endl;
 					// cout << "Residual line is: >" << line.c_str() << std::endl;
-					cout << "freq == " << myAureaFreq << std::endl;
+					cout << "freq == " << myAureaFreq << " \t [ 1 Tag == " << ((1.0 / myAureaFreq) * 1e+9) << " ns]" << std::endl;
 					cout << "discr level (Max. Time, ns) == " << myUpperDiscrLevel << std::endl;
+					cout << "Overflow value int the result file (ns): " << std::endl;
+					cout << ( ((double)myOverflowVal)/1.0e+3) << " ns == " <<
+					 (  (((double)myOverflowVal)/1.0e+3) / ((1.0 / myAureaFreq) * 1e+9) ) <<
+					 " Tags" << std::endl;
 				}
 			}
 			else {
