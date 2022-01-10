@@ -40,11 +40,11 @@ int main(int argc, char ** argv)
 		fname01in = args[1];
 		fname04result = args[2];
 		fname02out1 = args[3];
-		fname02out1.append("\\demo_out_ch1.txt");
+		fname02out1.append("\\Temp_Binary_ch1.txt");
 		fname03out2 = args[3];
-		fname03out2.append("\\demo_out_ch2.txt");
+		fname03out2.append("\\Temp_Binary_ch2.txt");
 		fname03out3header = args[3];
-		fname03out3header.append("\\demo_out_header.txt");
+		fname03out3header.append("\\Temp_header.txt");
 		
 		fnameLogFile = fname04result + std::string(".log");
 

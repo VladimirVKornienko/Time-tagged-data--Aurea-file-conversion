@@ -141,7 +141,7 @@ logFile << "N files to create: " << BUBnFiles << "\n";
 	std::ofstream BUBcopyTO;
 
 	uint64_t BUBtotalItems;
-	// for counting for individual files.
+	// for counting individual files.
 
 	// cout << "File name demo: " << BUBcurrOutputFileName.c_str() << std::endl;
 
@@ -322,6 +322,7 @@ logFile << "HEADER WRITTEN\n";
 		BUBcopyFROM.open(BUBcurrOutputFileName);
 		
 		BUBtmpName = fileOutName;
+		BUBtmpName.append("_");
 		BUBtmpName.append(std::to_string(jj));
 		BUBtmpName.append(".dat");
 
