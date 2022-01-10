@@ -67,7 +67,8 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	double inMeasTime, uint64_t Ncnts1, uint64_t Ncnts2,
 	uint64_t* OUTnOVFLmarkersESTIMATE, uint64_t* OUTnOVFLmarkersREAL, std::ofstream & logFile);
 
-int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2);
+int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2,
+	double INdPSin1Tag);
 // 20.12.: header processing will be added later.
 // , const char* fileOutNameCh2
 // , const char* fileOutNameHEADER

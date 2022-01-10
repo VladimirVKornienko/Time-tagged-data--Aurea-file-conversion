@@ -290,7 +290,8 @@ int main(int argc, char ** argv)
 
 	b = ConvertPTUtoAUREA(	(fname04result + std::string("1.dat")).c_str(),
 							stage4fileOutCh1.c_str(),
-							stage4fileOutCh2.c_str() );
+							stage4fileOutCh2.c_str(),
+							dPSin1Tag );
 
 	cout << "Process exited with code: b == " << b << std::endl;
 #ifdef use_log_file_output

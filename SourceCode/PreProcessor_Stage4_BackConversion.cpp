@@ -10,7 +10,8 @@ using namespace std;
 //	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
 
 
-int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2)
+int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const char* fileOutCh2,
+						double INdPSin1Tag)
 
 	// 20.12.: header processing will be added later.
 	// , const char* fileOutNameCh2
@@ -74,26 +75,39 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 	std::string line = "initial_value";
 	ossTMP.str(line);
 
+// GGGGGGGGGGGGGGGGGGGG
 	uint64_t currTAG = 0;		// reading from file, converting to tags and times
 	double currTIMEps = 0.0;	// ps
 	
 	uint32_t PTUrecord = 0;	// will be used for extracting the data from PTU-file.
 
-	const uint64_t T2WRAPAROUND = 210698240;	// ToDo: change to 2^28 here and in pre-processor (Aurea).
+// GGGGGGGGGGGGGGGGGGGG
+
+//	const uint64_t T2WRAPAROUND = 210698240;	// ToDo: change to 2^28 here and in pre-processor (Aurea).
 	
+// 18.11.2021: changed to match PicoHarp Parser...
+// From "constants.cpp": const uint32_t myOverflowVal = 210698240 ;
+// <<<
+
+
 	int PTUchannel = 0;		
 	uint32_t PTUtimePS = 0;	// number of picoseconds, as read from the record.
 	
 	double PTUcurrTimeExcessPS = 0.0;	// increased when overflow marker in PTU file,
-										// decreased when (% + time) > myPSin1tag.
+										// decreased when (% + time) > INdPSin1Tag.
 										// Can be negative.
 
 	
-	double myPSin1tag;
-	myPSin1tag = (1.0 / (double)625000) * 1e+12; // ps
+	// GGGGGGGGGGGGGGGGGGGG
+	// double myPSin1tag;
+	// myPSin1tag = (1.0 / (double)625000) * 1e+12; // ps
+
+	// now: <INdPSin1Tag> is passed as a parameter.
+
 	// ToDo:
 	// manually programmed to 625 kHz
 	// replace with input from main program (later)
+	// GGGGGGGGGGGGGGGGGGGG
 
 
 	fscanfSTATUS = fread(&PTUrecord, helpSizeUINT32, unityForFWRITE, fileInHandle);
@@ -116,7 +130,10 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 			
 			// PTUtimePS = 0;	>> not needed now...
 			// PTUchannel = -1;	>> also not needed...
-			PTUcurrTimeExcessPS = PTUcurrTimeExcessPS + (double)T2WRAPAROUND;
+			
+			// PTUcurrTimeExcessPS = PTUcurrTimeExcessPS + (double)T2WRAPAROUND;
+			PTUcurrTimeExcessPS = PTUcurrTimeExcessPS + (double)myOverflowVal;
+
 			// unwrap the time tag overflow	
 
 #ifdef stage4_Write_Overflow_Flags_ToFile
@@ -135,12 +152,12 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 			PTUchannel = (int)(PTUrecord >> 28);	
 
 			// convert input data to TAGS and TIMES:
-			// each time we increment a tag (+=1), we decrement <PTUcurrTimeExcessPS> (-= myPSin1tag)
+			// each time we increment a tag (+=1), we decrement <PTUcurrTimeExcessPS> (-= INdPSin1Tag)
 			currTIMEps = ((double)PTUtimePS) + PTUcurrTimeExcessPS;
-			while (currTIMEps > myPSin1tag)
+			while (currTIMEps > INdPSin1Tag)
 			{
-				currTIMEps = currTIMEps - myPSin1tag;
-				PTUcurrTimeExcessPS = PTUcurrTimeExcessPS - myPSin1tag;
+				currTIMEps = currTIMEps - INdPSin1Tag;
+				PTUcurrTimeExcessPS = PTUcurrTimeExcessPS - INdPSin1Tag;
 				currTAG = currTAG + (uint64_t)1;
 			}
 
