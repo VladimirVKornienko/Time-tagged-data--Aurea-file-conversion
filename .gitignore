@@ -33,6 +33,7 @@
 
 # except for this one:
 !SourceCode/Source.exe
+!SourceCode/CheckMaxNumConsecutiveOVFLmarkers.exe
 
 # VS code files
 SourceCode/.vscode
