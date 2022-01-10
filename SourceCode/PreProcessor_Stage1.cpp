@@ -256,6 +256,15 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 					cout << ( ((double)myOverflowVal)/1.0e+3) << " ns == " <<
 					 (  (((double)myOverflowVal)/1.0e+3) / ((1.0 / myAureaFreq) * 1e+9) ) <<
 					 " Tags" << std::endl;
+#ifdef use_log_file_output
+logFile << "freq == " << myAureaFreq << " \t [ 1 Tag == " << ((1.0 / myAureaFreq) * 1e+9) << " ns]\n";
+logFile << "discr level (Max. Time, ns) == " << myUpperDiscrLevel << "\n";
+logFile << "Overflow value int the result file (ns):\n";
+logFile << ( ((double)myOverflowVal)/1.0e+3) << " ns == " <<
+ (  (((double)myOverflowVal)/1.0e+3) / ((1.0 / myAureaFreq) * 1e+9) ) <<
+ " Tags\n";
+#endif
+
 				}
 			}
 			else {
@@ -526,6 +535,10 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	{	// ch2 lacks some of the ticks - thus, select channel 2 as output;
 		// fileOut1.close();
 		cout << "ch2 selected, file 1 WILL BE closed (LATER!)." << std::endl;
+#ifdef use_log_file_output
+logFile << "ch2 selected, file 1 WILL BE closed (LATER!).\n";
+#endif
+
 		
 		// while ((runFlag) && (i < 5000)) // << DEBUG << //
 		while (runFlag)
@@ -584,6 +597,9 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			else
 			{
 				cout << "unknown record encountered at stage 3, aborting..." << std::endl;
+#ifdef use_log_file_output
+logFile << "unknown record encountered at stage 3, aborting...\n";
+#endif
 				runFlag = false;
 			}
 		}
@@ -592,6 +608,10 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 	{	// else, select channel 1 as output;
 		// fileOut2.close();
 		cout << "ch1 selected, file 2 WILL BE closed (LATER!)." << std::endl;
+#ifdef use_log_file_output
+logFile << "ch1 selected, file 2 WILL BE closed (LATER!).\n";
+#endif
+
 		
 		// while ((runFlag) && (i < 5000)) // << DEBUG << //
 		while (runFlag)
@@ -649,6 +669,9 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 			else
 			{
 				cout << "unknown record encountered at stage 3, aborting..." << std::endl;
+#ifdef use_log_file_output
+logFile << "unknown record encountered at stage 3, aborting...\n";
+#endif
 				runFlag = false;
 			}
 		}

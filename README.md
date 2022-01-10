@@ -31,20 +31,14 @@ auxTimePS = ((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - la
 (-4) (IMP!) Check for erroneous <std::endl> usage. Replace with a newline character!
 	== replace with "\n" where possible.
 
-(-3a) put all the includes in a header
-
-(-3b) split large instructions ([stage1], [stage2], ...)
-		into different *.cpp-files
-	(otherwise, very error-prone when editing / searching)
+(-3) Log file: implement a logging function, which will be responsible for
+both console and file output.
+	NB! currently, messages about file I/O conflicts are NOT written to LOG (matter of simplicity). !NB
 
 (-2) In [stage1] (and partially in [stage4], change file read instructions 
 				according to [stage3], which is working fine.
 			(???)
 
-(-1) Create reverse wrapper (ptu -> Aurea formats)
-
-(0) Check float-point operations when introducing an overflow event/marker;
-maybe, precision is lost in (numerous) type castings
 
 (1) [later] Add buffer for read/write operations on files [stage1, Stage3]
 

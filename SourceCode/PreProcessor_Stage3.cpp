@@ -112,6 +112,13 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	cout << "N files to create: " << BUBnFiles << std::endl;
 	// ms / s .
 
+#ifdef use_log_file_output
+logFile << "BUBnFiles: " << BUBnFiles << " \tinMeasTime: " << inMeasTime << " \tTimeToSplitSEC: ";
+logFile << TimeToSplitSEC << "\n";
+logFile << "N files to create: " << BUBnFiles << "\n";
+#endif
+
+
 	uint64_t nOVFLmarkersESTIMATE = (uint64_t)(trunc(
 		(inMeasTime / ((double)BUBnFiles))	* 1.0e-3 / ((double)myOverflowVal * 1.0e-12)
 	));
@@ -282,6 +289,10 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 	// << Ver2 //
 
 	cout << "HEADER WRITTEN" << std::endl;
+#ifdef use_log_file_output
+logFile << "HEADER WRITTEN\n";
+#endif
+
 
 	// VKORN_TUESDAY >>
 	// VKORN DESPERATE FLAG >>
@@ -402,10 +413,16 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	// DEBUG PRINT: >>
 	cout << "Defined masks (Ch1 // Ch2 // OverflowBit):" << std::endl;
-
 	cout << std::bitset<32>(myCh1Mask) << std::endl;
 	cout << std::bitset<32>(myCh2Mask) << std::endl;
 	cout << std::bitset<32>(myOVFLMask) << std::endl;
+
+#ifdef use_log_file_output
+logFile << "Defined masks (Ch1 // Ch2 // OverflowBit):\n";
+logFile << std::bitset<32>(myCh1Mask) << "\n";
+logFile << std::bitset<32>(myCh2Mask) << "\n";
+logFile << std::bitset<32>(myOVFLMask) << "\n";
+#endif
 	// <<
 
 	std::size_t	helpSizeUINT32 = sizeof(uint32_t); // for I/O operations //
@@ -483,6 +500,10 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 
 	
 	cout << std::endl << std::endl << "entering the output loop:" << std::endl;
+#ifdef use_log_file_output
+logFile << std::endl << std::endl << "entering the output loop:\n";
+#endif
+
 	
 	// LABEL EVENING TYPES >>>
 	//uint64_t BUBskipTAG;
@@ -525,6 +546,12 @@ int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOut
 		cout << "BUBskipTAG (max tag to process in this file) = " << BUBskipTAG << std::endl;
 		cout << "ch1tag: " << ch1tag << " \tch1time: " << ch1time << std::endl;
 		cout << "ch2tag: " << ch2tag << " \tch2time: " << ch2time << std::endl;
+#ifdef use_log_file_output
+logFile << "First record (i=" << BUBcurrFileN << "):\n";
+logFile << "BUBskipTAG (max tag to process in this file) = " << BUBskipTAG << "\n";
+logFile << "ch1tag: " << ch1tag << " \tch1time: " << ch1time << "\n";
+logFile << "ch2tag: " << ch2tag << " \tch2time: " << ch2time << "\n";
+#endif
 		// #endif
 
 #ifdef AureaProcessorPart2OverflowDebuggingMessages
@@ -936,7 +963,9 @@ fhOutAuxCh1 << "   " << ch1tag << "   " << ch1time << std::endl;
 
 		*OUTnOVFLmarkersREAL = *OUTnOVFLmarkersREAL + nOVFLmarkersREAL;
 		cout << "Overflows: EST = " << nOVFLmarkersESTIMATE << " \tREAL = " << nOVFLmarkersREAL << std::endl;
-
+#ifdef use_log_file_output
+logFile << "Overflows: EST = " << nOVFLmarkersESTIMATE << " \tREAL = " << nOVFLmarkersREAL << "\n";
+#endif
 
 		// VKORN DESPERATE FLAG >>
 		// fileOutHandle.flush();

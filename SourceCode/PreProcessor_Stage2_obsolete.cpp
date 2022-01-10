@@ -5,6 +5,9 @@
 *
 */
 
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
+//	*		   Log file operation not implemented.		*	//
+//	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
 
 //	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	//
 //		Stage1 (+) splits the file in three + extracts PSin1Tag, MeasTime, Nch1, Nch2 from the file.		//
