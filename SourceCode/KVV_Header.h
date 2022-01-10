@@ -82,5 +82,6 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 extern const uint32_t myOverflowVal;
 extern const int AUREABytesInATagName;
 extern const double AUREAGlobalResolution;
+extern const std::string    custom_output_file_postfix;
 
 #endif

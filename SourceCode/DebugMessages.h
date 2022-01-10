@@ -5,7 +5,8 @@
 //	*	*	*	*	*	*	*	*	*	*	*	//
 
 #ifndef use_back_conversion_of_stage_4
-#define use_back_conversion_of_stage_4
+        // IMP //
+// #define use_back_conversion_of_stage_4
 // uncomment to use back-conversion from PTU format to AUREA intrinsic format.
 #endif
 
@@ -17,7 +18,8 @@
 
 
 #ifndef stage4_Write_Overflow_Flags_ToFile
-#define stage4_Write_Overflow_Flags_ToFile
+        // IMP //
+// #define stage4_Write_Overflow_Flags_ToFile
 
 // (un)comment for writing (skipping) overflow markers when de-coding back from PTU format to Aurea format.
 
@@ -29,7 +31,8 @@
 #endif
 
 #ifndef stage3_DEBUG_re_create_files_with_text_tag_time_values
-#define stage3_DEBUG_re_create_files_with_text_tag_time_values
+        // IMP //
+// #define stage3_DEBUG_re_create_files_with_text_tag_time_values
 
 // uncomment to create 2 add. files with tags and times, as seen in stage 3.
 // (Not from PTU file, as in Stage 4).

@@ -135,7 +135,7 @@ logFile << "N files to create: " << BUBnFiles << "\n";
 	
 	// BUBBUBBUB
 	BUBcurrOutputFileName = fileOutName;
-	BUBcurrOutputFileName.append("_");
+	BUBcurrOutputFileName.append(custom_output_file_postfix.c_str());
 	BUBcurrOutputFileName.append(std::to_string(BUBcurrFileN));
 	BUBcurrOutputFileName.append(".dat");
 	std::ifstream BUBcopyFROM;
@@ -323,7 +323,7 @@ logFile << "HEADER WRITTEN\n";
 		BUBcopyFROM.open(BUBcurrOutputFileName);
 		
 		BUBtmpName = fileOutName;
-		BUBtmpName.append("_");
+		BUBtmpName.append(custom_output_file_postfix.c_str());
 		BUBtmpName.append(std::to_string(jj));
 		BUBtmpName.append(".dat");
 
@@ -519,7 +519,7 @@ logFile << std::endl << std::endl << "entering the output loop:\n";
 	{ // MAIN NEW CYCLE
 
 		BUBcurrOutputFileName = fileOutName;
-		BUBcurrOutputFileName.append("_");
+		BUBcurrOutputFileName.append(custom_output_file_postfix.c_str());
 		BUBcurrOutputFileName.append(std::to_string(BUBcurrFileN));
 		BUBcurrOutputFileName.append(".dat");
 

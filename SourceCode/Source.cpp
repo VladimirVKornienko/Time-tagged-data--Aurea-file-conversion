@@ -30,18 +30,21 @@ int main(int argc, char ** argv)
 
 	
 	// 10.01.2022: changing from 3 arguments to one (input file only): //
+	std::size_t PARSED_ElemPos;
+	std::string PARSED_dir_name;
+	std::string PARSED_file_name;
+	std::string PARSED_file_extension;
+
 	if (args.size() == 1+1) // 1 argument is there by default...
 	{
 		fname01in = args[1];
 		
-		std::size_t PARSED_ElemPos;
-	
 		PARSED_ElemPos = fname01in.find_last_of("\\");
-		std::string PARSED_dir_name = fname01in.substr(0, PARSED_ElemPos);
-		std::string PARSED_file_name = fname01in.substr(PARSED_ElemPos+1, fname01in.length());
+		PARSED_dir_name = fname01in.substr(0, PARSED_ElemPos);
+		PARSED_file_name = fname01in.substr(PARSED_ElemPos+1, fname01in.length());
 	
 		PARSED_ElemPos = PARSED_file_name.find_last_of(".");
-		std::string PARSED_file_extension = PARSED_file_name.substr(PARSED_ElemPos+1, PARSED_file_name.length());
+		PARSED_file_extension = PARSED_file_name.substr(PARSED_ElemPos+1, PARSED_file_name.length());
 		PARSED_file_name = PARSED_file_name.substr(0, PARSED_ElemPos);
 
 		// Debug print:
@@ -50,7 +53,8 @@ int main(int argc, char ** argv)
 		// cout << "\nPARSED_file_extension == " << PARSED_file_extension << "\n\n";
 		// .
 		
-		fname04result = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_pr.dat");
+		// fname04result = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_pr.dat");
+		fname04result = PARSED_dir_name + std::string("\\") + PARSED_file_name; // No extension, no postfix!
 		fname02out1 = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_TmpBnr_ch1.dat");
 		fname03out2 = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_TmpBnr_ch2.dat");
 		fname03out3header = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_TmpHeader.dat");
@@ -76,7 +80,7 @@ int main(int argc, char ** argv)
 		fname02out1 = "C:\\tmp\\default_TT_TmpBnr_ch1.txt";
 		fname03out2 = "C:\\tmp\\default_TT_TmpBnr_ch2.txt";
 		fname03out3header = "C:\\tmp\\default_TT_TmpHeader.txt";
-		fname04result = "C:\\tmp\\default_TT_result_pr.txt";
+		fname04result = "C:\\tmp\\default_TT_result";	// No extension, no postfix.
 		fnameLogFile = "C:\\tmp\\default_TT_result_pr.log";
 
 #ifdef use_log_file_output
@@ -180,14 +184,14 @@ int main(int argc, char ** argv)
 	cout << "ch1: " << fname02out1 << std::endl;
 	cout << "ch2: " << fname03out2 << std::endl;
 	cout << "header: " << fname03out3header << std::endl;
-	cout << "result file (output): " << fname04result << std::endl << std::endl;
+	cout << "output file: " << fname04result << std::endl << std::endl;
 
 #ifdef use_log_file_output
 	logFile << "in: " << fname01in << std::endl;
 	logFile << "ch1: " << fname02out1 << std::endl;
 	logFile << "ch2: " << fname03out2 << std::endl;
 	logFile << "header: " << fname03out3header << std::endl;
-	logFile << "result file (output): " << fname04result << std::endl << std::endl;
+	logFile << "output file: " << fname04result << std::endl << std::endl;
 
 	logFile.flush();
 #endif
@@ -348,23 +352,30 @@ int main(int argc, char ** argv)
 
 	// process only the first file of a bucket - for simplicity matters:
 
-	// ToDo: re-introduce path variables, and strip the path to main file. //
-	// Then it will be possible to use auto-generated path here... //
-
-	cout << "performing back-conversion (stage 4):" << std::endl;	
-	cout << "File name: " << (fname04result + std::string("_1.dat")).c_str() << std::endl;
-#ifdef use_log_file_output
-	logFile << "performing back-conversion (stage 4):\n";	
-	logFile << "File name: " << (fname04result + std::string("_1.dat")).c_str() << "\n";
-#endif
-
-
 	std::string stage4fileOutCh1;
 	std::string stage4fileOutCh2;
-	stage4fileOutCh1 = "C:\\tmp\\LabProcessing\\Dec24\\back_conv_ch1.dat";
-	stage4fileOutCh2 = "C:\\tmp\\LabProcessing\\Dec24\\back_conv_ch2.dat";
 
-	b = ConvertPTUtoAUREA(	(fname04result + std::string("_1.dat")).c_str(),
+	// obsolete:
+// stage4fileOutCh1 = "C:\\tmp\\LabProcessing\\Dec24\\back_conv_ch1.dat";
+// stage4fileOutCh2 = "C:\\tmp\\LabProcessing\\Dec24\\back_conv_ch2.dat";
+	// .
+	// now:
+	stage4fileOutCh1 = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_BackConv_Ch1.dat");
+	stage4fileOutCh2 = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_BackConv_Ch2.dat");
+	// .
+
+	// GGGGGGGGGGGGGGGGGGGGGGGG
+
+	cout << "performing back-conversion (stage 4):" << std::endl;	
+	cout << "Input file name: " << (fname04result + custom_output_file_postfix + std::string("1.dat")).c_str() << "\n";
+	cout << "Output files: " << stage4fileOutCh1 << "  , " << stage4fileOutCh2 << "\n";
+#ifdef use_log_file_output
+	logFile << "performing back-conversion (stage 4):\n";	
+	logFile << "Input file name: " << (fname04result + custom_output_file_postfix + std::string("1.dat")).c_str() << "\n";
+	logFile << "Output files: " << stage4fileOutCh1 << "  , " << stage4fileOutCh2 << "\n";
+#endif
+
+	b = ConvertPTUtoAUREA(	(fname04result + custom_output_file_postfix + std::string("1.dat")).c_str(),
 							stage4fileOutCh1.c_str(),
 							stage4fileOutCh2.c_str(),
 							dPSin1Tag );
@@ -376,9 +387,9 @@ int main(int argc, char ** argv)
 
 	
 #else
-	cout << "Back-conversion not performed -- uncomment it in 'source.cpp'." << std::endl;
+	cout << "Back-conversion not performed. To enable, uncomment '#define use_back_conversion_of_stage_4' in 'DebugMessages.h'.\n";
 #ifdef use_log_file_output
-	logFile << "Back-conversion not performed -- uncomment it in 'source.cpp'.\n";
+	logFile << "Back-conversion not performed. To enable, uncomment '#define use_back_conversion_of_stage_4' in 'DebugMessages.h'.\n";
 #endif
 
 #endif
@@ -401,6 +412,10 @@ int main(int argc, char ** argv)
 	if( std::remove(fname03out3header.c_str()) != 0 )
     	cout << "Error deleting temp. file (header file)!\n";
 #endif
+
+	cout << "Press <Enter> key to close the window...  ";
+	std::getchar();
+	// or: system("pause");
 
 	return 0;
 }

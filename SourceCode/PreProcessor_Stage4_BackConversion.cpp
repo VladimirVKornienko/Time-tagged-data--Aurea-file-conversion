@@ -143,7 +143,7 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 			// sprintf(line.c_str(), "\t%d\t%f\n", currTAG, currTIME);
 			ossTMP.str("");
 			currTIMEps = currTIMEps / 1000.;
-			ossTMP << currTAG << "\t" << currTIMEps << std::endl;
+			ossTMP << currTAG << "\t" << currTIMEps << "\n";
 			
 			if (PTUchannel == 0)
 			{
