@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
 			cout << "Error opening the log file!" << std::endl;
 			return 1;
 		}
-		logFile << "Using file names from command line arguments:" << std::endl;
+		logFile << "Using file names from command line arguments:\n";
 #endif
 	}
 	else
@@ -95,7 +95,7 @@ int main(int argc, char ** argv)
 			cout << "Error opening the log file!" << std::endl;
 			return 1;
 		}
-		logFile << cout << "Using default file names:" << std::endl;
+		logFile << cout << "Using default file names:\n";
 #endif
 
 	}
@@ -105,6 +105,16 @@ int main(int argc, char ** argv)
 	cout << "ch2: " << fname03out2 << std::endl;
 	cout << "header: " << fname03out3header << std::endl;
 	cout << "result file (output): " << fname04result << std::endl << std::endl;
+
+#ifdef use_log_file_output
+	logFile << "in: " << fname01in << std::endl;
+	logFile << "ch1: " << fname02out1 << std::endl;
+	logFile << "ch2: " << fname03out2 << std::endl;
+	logFile << "header: " << fname03out3header << std::endl;
+	logFile << "result file (output): " << fname04result << std::endl << std::endl;
+#endif
+
+
 
 	uint64_t a = 1;
 	int b = 0;
@@ -120,8 +130,10 @@ int main(int argc, char ** argv)
 	// defining a 4-bit structure (8). //
 	// NUMBER to ITS BYTE (not BIT - it is done with std::bitset<64>(<obj>)) REPRESENTATION (9). //
 
-	cout << std::endl << "* * *     Aurea pre-formatter testing     * * *" << std::endl;
-	
+	cout << std::endl << "* * *     Aurea pre-formatter      * * *" << std::endl;
+#ifdef use_log_file_output
+	logFile << std::endl << "* * *     Aurea pre-formatter      * * *\n";
+#endif
 	
 	// DEBUGGING: >>> //
 	/*
@@ -187,6 +199,10 @@ int main(int argc, char ** argv)
 
 	cout << std::endl << "Stage 1. Splitting the file in three (header, ch1, ch2):" << std::endl << std::endl;
 
+#ifdef use_log_file_output
+	logFile << std::fixed << std::setprecision(2);
+	logFile << "\nStage 1. Splitting the file in three (header, ch1, ch2):\n\n";
+#endif
 
 	b = PreProcessAureaDataStage1(fname01in.c_str(), fname02out1.c_str(), 
 		fname03out2.c_str(),
@@ -201,11 +217,24 @@ int main(int argc, char ** argv)
 	cout << std::endl << "Total counts skipped (zero or too large):" << std::endl;
 	cout << "Ch.1: " << MAINskippedCh1 << " \t Ch.2: " << MAINskippedCh2 << std::endl;
 
-	cout << std::endl << std::endl << "[REDUNDANT!] waiting 1 second for the files to sync..." << std::endl << std::endl;
 	Sleep(200);
 
 	cout << std::endl << "Starting a new part - combining 3 files into one (HH T2 format)(Stage 2):" << std::endl << std::endl;
 	cout << "myOverflowVal == " << myOverflowVal << std::endl;
+
+#ifdef use_log_file_output
+	logFile << "Process exited with code: b == " << b << "\n";
+	logFile << "dPSin1Tag == " << dPSin1Tag << " \t" << "MeasTime (ms) = " << MeasTime << "\n";
+	
+	logFile << "\nCounts in Ch.1: " << NcntsCh1 << " ; \tCounts in Ch.2: " << NcntsCh2 << "\n";
+	logFile << "Total counts (N_ch1 + N_ch2): " << (NcntsCh1 + NcntsCh2) << "\n";
+	logFile << std::endl << "Total counts skipped (zero or too large):" << "\n";
+	logFile << "Ch.1: " << MAINskippedCh1 << " \t Ch.2: " << MAINskippedCh2 << "\n";
+
+	logFile << "\nStarting a new part - combining 3 files into one (HH T2 format)(Stage 2):\n\n";
+	logFile << "myOverflowVal == " << myOverflowVal << "\n";
+#endif
+
 
 	// VKORN DESPERATE FLAG >>
 	//b = PreProcessAureaDataStage2(fname04result.c_str(), fname02out1.c_str(),
@@ -232,7 +261,9 @@ int main(int argc, char ** argv)
 	// << VKORN DESPERATE FLAG
 
 	cout << "Process exited with code: b == " << b << std::endl;
-
+#ifdef use_log_file_output
+	logFile << "Process exited with code: b == " << b << "\n";
+#endif
 	
 	
 #ifdef use_back_conversion_of_stage_4
@@ -244,6 +275,11 @@ int main(int argc, char ** argv)
 
 	cout << "performing back-conversion (stage 4):" << std::endl;	
 	cout << "File name: " << (fname04result + std::string("1.dat")).c_str() << std::endl;
+#ifdef use_log_file_output
+	logFile << "performing back-conversion (stage 4):\n";	
+	logFile << "File name: " << (fname04result + std::string("1.dat")).c_str() << "\n";
+#endif
+
 
 	std::string stage4fileOutCh1;
 	std::string stage4fileOutCh2;
@@ -255,10 +291,24 @@ int main(int argc, char ** argv)
 							stage4fileOutCh2.c_str() );
 
 	cout << "Process exited with code: b == " << b << std::endl;
+#ifdef use_log_file_output
+	logFile << "Process exited with code: b == " << b << "\n";
+#endif
+
 	
 #else
 	cout << "Back-conversion not performed -- uncomment it in 'source.cpp'." << std::endl;
+#ifdef use_log_file_output
+	logFile << "Back-conversion not performed -- uncomment it in 'source.cpp'.\n";
+#endif
+
 #endif
 	
+#ifdef use_log_file_output
+	logFile.flush();
+	logFile.close();
+#endif
+
+
 	return 0;
 }
