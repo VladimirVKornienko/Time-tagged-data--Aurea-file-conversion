@@ -52,7 +52,7 @@ int main(int argc, char ** argv)
 	
 #ifdef use_log_file_output
 		logFile.open(fnameLogFile);
-		if (!fileInHandle.is_open())
+		if (!logFile.is_open())
 		{
 			cout << "Error opening the log file!" << std::endl;
 			return 1;
@@ -90,12 +90,12 @@ int main(int argc, char ** argv)
 
 #ifdef use_log_file_output
 		logFile.open(fnameLogFile);
-		if (!fileInHandle.is_open())
+		if (!logFile.is_open())
 		{
 			cout << "Error opening the log file!" << std::endl;
 			return 1;
 		}
-		logFile << cout << "Using default file names:\n";
+		logFile << "Using default file names:\n";
 #endif
 
 	}
@@ -132,7 +132,7 @@ int main(int argc, char ** argv)
 
 	cout << std::endl << "* * *     Aurea pre-formatter      * * *" << std::endl;
 #ifdef use_log_file_output
-	logFile << std::endl << "* * *     Aurea pre-formatter      * * *\n";
+	logFile << "\n* * *     Aurea pre-formatter      * * *\n";
 #endif
 	
 	// DEBUGGING: >>> //
@@ -207,7 +207,8 @@ int main(int argc, char ** argv)
 	b = PreProcessAureaDataStage1(fname01in.c_str(), fname02out1.c_str(), 
 		fname03out2.c_str(),
 		fname03out3header.c_str(),
-		&dPSin1Tag, &MeasTime, &NcntsCh1, &NcntsCh2, &MAINskippedCh1, &MAINskippedCh2);
+		&dPSin1Tag, &MeasTime, &NcntsCh1, &NcntsCh2, &MAINskippedCh1, &MAINskippedCh2,
+		logFile);
 
 	cout << "Process exited with code: b == " << b << std::endl;
 	cout << "dPSin1Tag == " << dPSin1Tag << " \t" << "MeasTime (ms) = " << MeasTime << std::endl;
@@ -228,7 +229,7 @@ int main(int argc, char ** argv)
 	
 	logFile << "\nCounts in Ch.1: " << NcntsCh1 << " ; \tCounts in Ch.2: " << NcntsCh2 << "\n";
 	logFile << "Total counts (N_ch1 + N_ch2): " << (NcntsCh1 + NcntsCh2) << "\n";
-	logFile << std::endl << "Total counts skipped (zero or too large):" << "\n";
+	logFile << "\nTotal counts skipped (zero or too large):" << "\n";
 	logFile << "Ch.1: " << MAINskippedCh1 << " \t Ch.2: " << MAINskippedCh2 << "\n";
 
 	logFile << "\nStarting a new part - combining 3 files into one (HH T2 format)(Stage 2):\n\n";
@@ -255,7 +256,8 @@ int main(int argc, char ** argv)
 
 	b = PreProcessAureaDataStage3splitter(SECONDStoSPLIT, fname04result.c_str(), fname02out1.c_str(),
 		fname03out2.c_str(), fname03out3header.c_str(), dPSin1Tag,
-		MeasTime, NcntsCh1, NcntsCh2, &MAINnOVFLmarkersESTIMATE, &MAINnOVFLmarkersREAL);
+		MeasTime, NcntsCh1, NcntsCh2, &MAINnOVFLmarkersESTIMATE, &MAINnOVFLmarkersREAL,
+		logFile);
 	
 
 	// << VKORN DESPERATE FLAG

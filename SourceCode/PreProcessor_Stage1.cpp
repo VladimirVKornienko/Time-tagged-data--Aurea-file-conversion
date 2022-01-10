@@ -66,7 +66,8 @@ using namespace std;
 //	uint64_t* outMeasTime, uint64_t* outNCh1, uint64_t* outNCh2, uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped)
 int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1, const char* fileOutNameCh2,
 	const char* fileOutNameHEADER, double* outAureaPSin1Tag,
-	double* outMeasTime, uint64_t* outNCh1, uint64_t* outNCh2, uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped)
+	double* outMeasTime, uint64_t* outNCh1, uint64_t* outNCh2,
+	uint64_t* OUTch1Nskipped, uint64_t* OUTch2Nskipped, std::ofstream & logFile)
 
 	// outMeasTime : Total measurement time in milliseconds, to be returned.
 

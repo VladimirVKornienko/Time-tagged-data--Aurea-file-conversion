@@ -87,7 +87,7 @@ using namespace std;
 int PreProcessAureaDataStage3splitter(double TimeToSplitSEC, const char* fileOutName, const char* fileInNameCh1, const char* fileInNameCh2,
 	const char* fileInNameHEADER, double inAureaPSin1Tag,
 	double inMeasTime, uint64_t Ncnts1, uint64_t Ncnts2,
-	uint64_t* OUTnOVFLmarkersESTIMATE, uint64_t* OUTnOVFLmarkersREAL)
+	uint64_t* OUTnOVFLmarkersESTIMATE, uint64_t* OUTnOVFLmarkersREAL, std::ofstream & logFile)
 	// [<MeasTime>] == milliseconds!! //
 {
 	// ToDo: add buffer structure following readTTTRR*.c //
