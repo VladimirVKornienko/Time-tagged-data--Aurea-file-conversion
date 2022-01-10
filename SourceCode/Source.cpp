@@ -212,28 +212,20 @@ int main(int argc, char ** argv)
 	
 #ifdef use_back_conversion_of_stage_4
 
+	// process only the first file of a bucket - for simplicity matters:
+
 	// ToDo: re-introduce path variables, and strip the path to main file. //
 	// Then it will be possible to use auto-generated path here... //
 
-	cout << "performing back-conversion:" << std::endl;
-	
-	cout << "File name: " << fname04result.c_str() << std::endl;
+	cout << "performing back-conversion (stage 4):" << std::endl;	
+	cout << "File name: " << (fname04result + std::string("1.dat")).c_str() << std::endl;
 
-	std::string stage4fileOutCh1 = "C:\\tmp\\a.dat";
-	std::string stage4fileOutCh2 = "C:\\tmp\\b.dat";
+	std::string stage4fileOutCh1;
+	std::string stage4fileOutCh2;
+	stage4fileOutCh1 = "C:\\tmp\\LabProcessing\\Dec24\\back_conv_ch1.dat";
+	stage4fileOutCh2 = "C:\\tmp\\LabProcessing\\Dec24\\back_conv_ch2.dat";
 
-	// stage4fileOutCh1 = "C:\\tmp\\a.dat";
-	// stage4fileOutCh2 = "C:\\tmp\\b.dat";
-
-	// stage4fileOutCh1 = (fname04result + "_ch1.dat");
-	// stage4fileOutCh2 = (fname04result + "_ch2.dat");
-
-	//b = ConvertPTUtoAUREA(  "C:\\tmp\\LabProcessing\\Dec24\\ser11n\\pr_s11f01a1.dat",
-		// fname04result.c_str(),
-	//						"C:\\tmp\\a.dat",
-	//						"C:\\tmp\\b.dat"  );
-
-	b = ConvertPTUtoAUREA(	fname04result.c_str(),
+	b = ConvertPTUtoAUREA(	(fname04result + std::string("1.dat")).c_str(),
 							stage4fileOutCh1.c_str(),
 							stage4fileOutCh2.c_str() );
 
