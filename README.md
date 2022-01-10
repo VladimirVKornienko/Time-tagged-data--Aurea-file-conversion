@@ -28,6 +28,9 @@ auxTimePS = ((ch2tag - lastOVFLtag) * inAureaPSin1Tag) + (1.0e3) * (ch2time - la
 
 	Current tasks:
 
+(-4) (IMP!) Check for erroneous <std::endl> usage. Replace with a newline character!
+	== replace with "\n" where possible.
+
 (-3a) put all the includes in a header
 
 (-3b) split large instructions ([stage1], [stage2], ...)

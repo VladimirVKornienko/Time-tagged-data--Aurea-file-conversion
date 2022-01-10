@@ -11,6 +11,8 @@ using namespace std;
 int main(int argc, char ** argv) 
 //int testfun(int argc, char ** argv)	// temp., for compiling other files. //
 {
+	std::ofstream logFile;
+	
 	std::vector<std::string> args(argv, argv + argc);
 	// VER1 :
 	// for (size_t i = 1; i < args.size(); ++i)
@@ -30,13 +32,11 @@ int main(int argc, char ** argv)
 	std::string fname03out2 = "";
 	std::string fname03out3header = "";
 	std::string fname04result = "";
+	std::string fnameLogFile = "";
 
-	// std::string const& aFileName;
-
+	
 	if (args.size() == 3+1) // 1 argument is there by default...
 	{
-		cout << "Using file names from command line arguments:" << std::endl;
-		
 		fname01in = args[1];
 		fname04result = args[2];
 		fname02out1 = args[3];
@@ -45,6 +45,20 @@ int main(int argc, char ** argv)
 		fname03out2.append("\\demo_out_ch2.txt");
 		fname03out3header = args[3];
 		fname03out3header.append("\\demo_out_header.txt");
+		
+		fnameLogFile = fname04result + std::string(".log");
+
+		cout << "Using file names from command line arguments:" << std::endl;
+	
+#ifdef use_log_file_output
+		logFile.open(fnameLogFile);
+		if (!fileInHandle.is_open())
+		{
+			cout << "Error opening the log file!" << std::endl;
+			return 1;
+		}
+		logFile << "Using file names from command line arguments:" << std::endl;
+#endif
 	}
 	else
 	{
@@ -73,6 +87,17 @@ int main(int argc, char ** argv)
 		// // fname03out2 = "Z:\\Documents\\ForPiton\\VCC_input_data\\demo_out_ch2.txt";
 		// // fname03out3header = "Z:\\Documents\\ForPiton\\VCC_input_data\\demo_out_header.txt";
 		// <<< //
+
+#ifdef use_log_file_output
+		logFile.open(fnameLogFile);
+		if (!fileInHandle.is_open())
+		{
+			cout << "Error opening the log file!" << std::endl;
+			return 1;
+		}
+		logFile << cout << "Using default file names:" << std::endl;
+#endif
+
 	}
 
 	cout << "in: " << fname01in << std::endl;

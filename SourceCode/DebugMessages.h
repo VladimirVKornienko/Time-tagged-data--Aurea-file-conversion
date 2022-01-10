@@ -10,6 +10,12 @@
 #endif
 
 
+#ifndef use_log_file_output
+#define use_log_file_output
+// uncomment to write log to file
+#endif
+
+
 #ifndef stage4_Write_Overflow_Flags_ToFile
 #define stage4_Write_Overflow_Flags_ToFile
 
