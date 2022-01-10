@@ -75,19 +75,10 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 	std::string line = "initial_value";
 	ossTMP.str(line);
 
-// GGGGGGGGGGGGGGGGGGGG
 	uint64_t currTAG = 0;		// reading from file, converting to tags and times
 	double currTIMEps = 0.0;	// ps
 	
 	uint32_t PTUrecord = 0;	// will be used for extracting the data from PTU-file.
-
-// GGGGGGGGGGGGGGGGGGGG
-
-//	const uint64_t T2WRAPAROUND = 210698240;	// ToDo: change to 2^28 here and in pre-processor (Aurea).
-	
-// 18.11.2021: changed to match PicoHarp Parser...
-// From "constants.cpp": const uint32_t myOverflowVal = 210698240 ;
-// <<<
 
 
 	int PTUchannel = 0;		
@@ -96,19 +87,6 @@ int ConvertPTUtoAUREA(const char* fileInNamePTU, const char* fileOutCh1, const c
 	double PTUcurrTimeExcessPS = 0.0;	// increased when overflow marker in PTU file,
 										// decreased when (% + time) > INdPSin1Tag.
 										// Can be negative.
-
-	
-	// GGGGGGGGGGGGGGGGGGGG
-	// double myPSin1tag;
-	// myPSin1tag = (1.0 / (double)625000) * 1e+12; // ps
-
-	// now: <INdPSin1Tag> is passed as a parameter.
-
-	// ToDo:
-	// manually programmed to 625 kHz
-	// replace with input from main program (later)
-	// GGGGGGGGGGGGGGGGGGGG
-
 
 	fscanfSTATUS = fread(&PTUrecord, helpSizeUINT32, unityForFWRITE, fileInHandle);
 	// JJJJJJJJJJJJJJJJ

@@ -168,14 +168,6 @@ int PreProcessAureaDataStage1(const char* fileInName, const char* fileOutNameCh1
 		return 1;
 	}
 
-	fileOut2 = fopen(fileOutNameCh2, "wb");
-	if (fileOut2 == NULL) {
-		cout << "Error opening file for Ch.2" << std::endl;
-		fileInHandle.close();
-		fclose(fileOut1);
-		return 1;
-	}
-
 	std::ofstream fileOut3header(fileOutNameHEADER);
 	if (!fileOut3header.is_open())
 	{

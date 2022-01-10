@@ -21,6 +21,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdio>		// for <std::remove> for deleting unnecessary temp. files.
 
 #include <iomanip>		// for outputting the float to required precision with 'cout' etc.
 #include <bitset>		// for binary representations >> debug only, most likely.

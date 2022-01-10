@@ -135,6 +135,7 @@ logFile << "N files to create: " << BUBnFiles << "\n";
 	
 	// BUBBUBBUB
 	BUBcurrOutputFileName = fileOutName;
+	BUBcurrOutputFileName.append("_");
 	BUBcurrOutputFileName.append(std::to_string(BUBcurrFileN));
 	BUBcurrOutputFileName.append(".dat");
 	std::ifstream BUBcopyFROM;
@@ -518,6 +519,7 @@ logFile << std::endl << std::endl << "entering the output loop:\n";
 	{ // MAIN NEW CYCLE
 
 		BUBcurrOutputFileName = fileOutName;
+		BUBcurrOutputFileName.append("_");
 		BUBcurrOutputFileName.append(std::to_string(BUBcurrFileN));
 		BUBcurrOutputFileName.append(".dat");
 

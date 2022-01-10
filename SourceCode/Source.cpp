@@ -11,8 +11,6 @@ using namespace std;
 int main(int argc, char ** argv) 
 //int testfun(int argc, char ** argv)	// temp., for compiling other files. //
 {
-	std::ofstream logFile;
-	
 	std::vector<std::string> args(argv, argv + argc);
 	// VER1 :
 	// for (size_t i = 1; i < args.size(); ++i)
@@ -21,11 +19,7 @@ int main(int argc, char ** argv)
 			// Do something with aFileName
 	//}
 
-	// const char* fname01in = "";
-	// const char* fname02out1 = "";
-	// const char* fname03out2 = "";
-	// const char* fname03out3header = "";
-	// const char* fname04result = "";
+	std::ofstream logFile;
 
 	std::string fname01in = "";
 	std::string fname02out1 = "";
@@ -35,6 +29,85 @@ int main(int argc, char ** argv)
 	std::string fnameLogFile = "";
 
 	
+	// 10.01.2022: changing from 3 arguments to one (input file only): //
+	if (args.size() == 1+1) // 1 argument is there by default...
+	{
+		fname01in = args[1];
+		
+		std::size_t PARSED_ElemPos;
+	
+		PARSED_ElemPos = fname01in.find_last_of("\\");
+		std::string PARSED_dir_name = fname01in.substr(0, PARSED_ElemPos);
+		std::string PARSED_file_name = fname01in.substr(PARSED_ElemPos+1, fname01in.length());
+	
+		PARSED_ElemPos = PARSED_file_name.find_last_of(".");
+		std::string PARSED_file_extension = PARSED_file_name.substr(PARSED_ElemPos+1, PARSED_file_name.length());
+		PARSED_file_name = PARSED_file_name.substr(0, PARSED_ElemPos);
+
+		// Debug print:
+		// cout << "\nPARSED_dir_name == " << PARSED_dir_name << "\n\n";
+		// cout << "\nPARSED_file_name == " << PARSED_file_name << "\n\n";
+		// cout << "\nPARSED_file_extension == " << PARSED_file_extension << "\n\n";
+		// .
+		
+		fname04result = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_pr.dat");
+		fname02out1 = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_TmpBnr_ch1.dat");
+		fname03out2 = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_TmpBnr_ch2.dat");
+		fname03out3header = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_TmpHeader.dat");
+		fnameLogFile = PARSED_dir_name + std::string("\\") + PARSED_file_name + std::string("_pr.log");
+
+		cout << "Using file names from command line arguments:\n";
+	
+#ifdef use_log_file_output
+		logFile.open(fnameLogFile);
+		if (!logFile.is_open())
+		{
+			cout << "Error opening the log file!\n";
+			return 1;
+		}
+		logFile << "Using file names from command line arguments:\n";
+#endif
+	}
+	else
+	{
+		cout << "Using default file names:\n";
+		// Default filenames: //
+		fname01in = "C:\\tmp\\default_TT_in.txt";
+		fname02out1 = "C:\\tmp\\default_TT_TmpBnr_ch1.txt";
+		fname03out2 = "C:\\tmp\\default_TT_TmpBnr_ch2.txt";
+		fname03out3header = "C:\\tmp\\default_TT_TmpHeader.txt";
+		fname04result = "C:\\tmp\\default_TT_result_pr.txt";
+		fnameLogFile = "C:\\tmp\\default_TT_result_pr.log";
+
+#ifdef use_log_file_output
+		logFile.open(fnameLogFile);
+		if (!logFile.is_open())
+		{
+			cout << "Error opening the log file!" << std::endl;
+			return 1;
+		}
+		logFile << "Using default file names:\n";
+#endif
+
+	}
+
+	/*
+	cout << "in: " << fname01in << std::endl;
+	cout << "ch1: " << fname02out1 << std::endl;
+	cout << "ch2: " << fname03out2 << std::endl;
+	cout << "header: " << fname03out3header << std::endl;
+	cout << "result file (output): " << fname04result << std::endl << std::endl;
+
+	cout << "in: " << fname01in << std::endl;
+	cout << "ch1: " << fname02out1 << std::endl;
+	cout << "ch2: " << fname03out2 << std::endl;
+	cout << "header: " << fname03out3header << std::endl;
+	cout << "result file (output): " << fname04result << std::endl << std::endl;
+	*/
+	
+
+	// old file path section:
+	/*
 	if (args.size() == 3+1) // 1 argument is there by default...
 	{
 		fname01in = args[1];
@@ -99,6 +172,9 @@ int main(int argc, char ** argv)
 #endif
 
 	}
+	*/
+
+	// end of old file path section.
 
 	cout << "in: " << fname01in << std::endl;
 	cout << "ch1: " << fname02out1 << std::endl;
@@ -112,9 +188,9 @@ int main(int argc, char ** argv)
 	logFile << "ch2: " << fname03out2 << std::endl;
 	logFile << "header: " << fname03out3header << std::endl;
 	logFile << "result file (output): " << fname04result << std::endl << std::endl;
+
+	logFile.flush();
 #endif
-
-
 
 	uint64_t a = 1;
 	int b = 0;
@@ -276,10 +352,10 @@ int main(int argc, char ** argv)
 	// Then it will be possible to use auto-generated path here... //
 
 	cout << "performing back-conversion (stage 4):" << std::endl;	
-	cout << "File name: " << (fname04result + std::string("1.dat")).c_str() << std::endl;
+	cout << "File name: " << (fname04result + std::string("_1.dat")).c_str() << std::endl;
 #ifdef use_log_file_output
 	logFile << "performing back-conversion (stage 4):\n";	
-	logFile << "File name: " << (fname04result + std::string("1.dat")).c_str() << "\n";
+	logFile << "File name: " << (fname04result + std::string("_1.dat")).c_str() << "\n";
 #endif
 
 
@@ -288,7 +364,7 @@ int main(int argc, char ** argv)
 	stage4fileOutCh1 = "C:\\tmp\\LabProcessing\\Dec24\\back_conv_ch1.dat";
 	stage4fileOutCh2 = "C:\\tmp\\LabProcessing\\Dec24\\back_conv_ch2.dat";
 
-	b = ConvertPTUtoAUREA(	(fname04result + std::string("1.dat")).c_str(),
+	b = ConvertPTUtoAUREA(	(fname04result + std::string("_1.dat")).c_str(),
 							stage4fileOutCh1.c_str(),
 							stage4fileOutCh2.c_str(),
 							dPSin1Tag );
@@ -312,6 +388,19 @@ int main(int argc, char ** argv)
 	logFile.close();
 #endif
 
+#ifndef keep_temporary_files
+	 
+	 // delete temporary files:
+	
+	if( std::remove(fname02out1.c_str()) != 0 )
+    	cout << "Error deleting temp. file (ch.1)!\n";
+
+	if( std::remove(fname03out2.c_str()) != 0 )
+    	cout << "Error deleting temp. file (ch.2)!\n";
+
+	if( std::remove(fname03out3header.c_str()) != 0 )
+    	cout << "Error deleting temp. file (header file)!\n";
+#endif
 
 	return 0;
 }

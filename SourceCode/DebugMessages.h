@@ -43,6 +43,12 @@
 
 #endif
 
+
+#ifndef keep_temporary_files
+// #define keep_temporary_files
+// when commented, the processor will delete temporary files (header + binary ch1, ch2)
+#endif
+
 #ifndef AureaProcessorPart2OverflowDebuggingMessages
 //#define AureaProcessorPart2OverflowDebuggingMessages
 // << uncomment to use debugging on first 10 records. //
